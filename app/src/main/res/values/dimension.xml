@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_linear_layout">16dp</dimen>
+    <dimen name="dialog">20dp</dimen>
+    <dimen name="spinner">40dp</dimen>
+</resources>

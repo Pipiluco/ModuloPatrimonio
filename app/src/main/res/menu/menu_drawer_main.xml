@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/itPatrimonio"
+            android:icon="@drawable/ic_items_01"
+            android:title="@string/patrimonio" />
+
+        <item
+            android:id="@+id/itEmpresa"
+            android:icon="@drawable/ic_empresa_01"
+            android:title="@string/empresa" />
+
+        <item
+            android:id="@+id/itEndereco"
+            android:icon="@drawable/ic_address_01"
+            android:title="@string/endereco" />
+
+        <item
+            android:id="@+id/itPerfil"
+            android:icon="@drawable/ic_add"
+            android:title="@string/perfil" />
+    </group>
+
+    <item android:title="Comunicação">
+        <menu>
+            <item
+                android:id="@+id/itShare"
+                android:icon="@drawable/ic_add"
+                android:title="Compartilhar" />
+
+            <item
+                android:id="@+id/itSend"
+                android:icon="@drawable/ic_add"
+                android:title="Enviar" />
+        </menu>
+    </item>
+</menu>
