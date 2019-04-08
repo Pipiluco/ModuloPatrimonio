@@ -5,6 +5,7 @@
     <string name="tipo">Tipo</string>
     <string name="marca">Marca</string>
     <string name="bairro">Bairro</string>
+    <string name="bloco">Bloco</string>
     <string name="cep">CEP</string>
     <string name="cidade">Cidade</string>
     <string name="cor">Cor</string>
@@ -16,6 +17,7 @@
     <string name="pais">País</string>
     <string name="plaqueta">Plaqueta</string>
     <string name="rua">Rua</string>
+    <string name="sala">Sala</string>
     <string name="setor">Setor</string>
     <string name="setores">Setores</string>
     <string name="nome">Nome</string>
@@ -28,7 +30,7 @@
 
 
     <string name="fantasia">Fantasia</string>
-    <string name="codigo">1</string>
+    <string name="codigo">Código</string>
     <string name="cnpj">CNPJ</string>
 
     <string name="novo">Novo</string>
@@ -45,12 +47,19 @@
     <string name="empresa_ja_existe">Já existe empresa salva com este código!</string>
     <string name="empresa_nao_encontrada">Empresa não encontrada!</string>
     <string name="empresa_salva">Empresa salva!</string>
+    <string name="endereco_atualizado">Endereço atualizado!</string>
+    <string name="endereco_excluido">Endereço excluído!</string>
     <string name="endereco_ja_existe">Já existe endereço salvo com estas informações!</string>
     <string name="endereco_nao_encontrado">Endereço não encontrado!</string>
     <string name="endereco_salvo">Endereço salvo!</string>
+    <string name="escolha_empresa">Escolha uma empresa</string>
+    <string name="escolha_setor">Escolha um setor</string>
+    <string name="necessario_empresa">É necessário criar uma empresa!</string>
+    <string name="necessario_setor">É necessário criar um setor!</string>
     <string name="nova_empresa">Nova empresa</string>
     <string name="novo_endereco">Novo endereço</string>
     <string name="novo_patrimonio">Novo patrimônio</string>
+    <string name="novo_setor">Novo setor</string>
     <string name="dados_incompletos">Dados incompletos!</string>
     <string name="patrimonio_ja_existe">Já existe patrimônio salvo com esta plaqueta!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>

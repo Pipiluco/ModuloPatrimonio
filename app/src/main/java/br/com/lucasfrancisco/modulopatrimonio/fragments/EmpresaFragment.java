@@ -90,15 +90,23 @@ public class EmpresaFragment extends Fragment {
 
     public void getListEmpresas() {
         final ArrayList<String> list = new ArrayList<>();
-        CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
         collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    list.add(documentSnapshot.getId());
+                    collectionReference.document(documentSnapshot.getId()).collection("Sobre").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
+                                Empresa empresa = snapshot.toObject(Empresa.class);
+                                list.add(empresa.getCodigo());
+                            }
+                            listEmpresas = list;
+                        }
+                    });
                 }
-                listEmpresas = list;
             }
         });
     }

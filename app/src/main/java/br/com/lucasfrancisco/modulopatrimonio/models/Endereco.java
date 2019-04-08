@@ -79,4 +79,9 @@ public class Endereco implements Serializable {
     public void setPais(String pais) {
         this.pais = pais;
     }
+
+    @Override
+    public String toString() {
+        return this.cidade + " - " + this.getRua() + " - " + this.getNumero();
+    }
 }

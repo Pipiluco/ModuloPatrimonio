@@ -1,5 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +30,7 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 public class NovoPatrimonioActivity extends AppCompatActivity {
     private Spinner spnEmpresa, spnSetor;
     private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
+    private FloatingActionButton fabNovaEmpresa, fabNovoSetor;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -52,8 +55,12 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         edtTipo = (EditText) findViewById(R.id.edtTipo);
         edtMarca = (EditText) findViewById(R.id.edtMarca);
         edtModelo = (EditText) findViewById(R.id.edtModelo);
+        fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
+        fabNovoSetor = (FloatingActionButton) findViewById(R.id.fabNovoSetor);
 
         spinnerEmpresas();
+        getFabNovaEmpresa();
+        getFabNovoSetor();
     }
 
     @Override
@@ -74,7 +81,17 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
     }
 
-    public Boolean salvar() { // Estável OK
+    public void salvar() { // Estável OK
+        if (spnEmpresa.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (spnSetor.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String empresa = spnEmpresa.getSelectedItem().toString();
         String setor = spnSetor.getSelectedItem().toString();
         String plaqueta = edtPlaqueta.getText().toString();
@@ -105,8 +122,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 isPatrimonio = true;
             }
         }
-
-        return isPatrimonio;
     }
 
     public List<String> getItensSpinner(Spinner spinner) {
@@ -200,6 +215,26 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
                     }
                 });
+            }
+        });
+    }
+
+    public void getFabNovaEmpresa() {
+        fabNovaEmpresa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void getFabNovoSetor() {
+        fabNovoSetor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NovoSetorActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -97,6 +97,7 @@ public class NovoEnderecoActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
                     getListEnderecos();
                     isEndereco = true;
+                    finish();
                 }
             }
         } else {

@@ -32,7 +32,10 @@
         <activity
             android:name=".activities.NovoEnderecoActivity"
             android:parentActivityName=".activities.MainActivity" />
-        <activity android:name=".activities.EnderecoActivity" />
+        <activity
+            android:name=".activities.EnderecoActivity"
+            android:parentActivityName=".activities.MainActivity" />
+        <activity android:name=".activities.NovoSetorActivity" />
     </application>
 
 </manifest>

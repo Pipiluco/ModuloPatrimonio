@@ -7,6 +7,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -19,9 +21,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
+import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 
 public class NovaEmpresaActivity extends AppCompatActivity {
     private EditText edtNome, edtFantasia, edtCodigo, edtCNPJ;
@@ -30,6 +35,7 @@ public class NovaEmpresaActivity extends AppCompatActivity {
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
+    private ArrayAdapter adapter;
     private ArrayList<String> listEmpresas;
 
 
@@ -50,6 +56,7 @@ public class NovaEmpresaActivity extends AppCompatActivity {
         spnEndereco = (Spinner) findViewById(R.id.spnEndereco);
         fabNovoEndereco = (FloatingActionButton) findViewById(R.id.fabNovoEndereco);
 
+        //getSpinnerEnderecos();
         getFabNovoEndereco();
     }
 
@@ -72,10 +79,12 @@ public class NovaEmpresaActivity extends AppCompatActivity {
     }
 
     public void salvar() {
+        Endereco endereco = (Endereco) spnEndereco.getSelectedItem();
         String nome = edtNome.getText().toString();
         String fantasia = edtFantasia.getText().toString();
         String codigo = edtCodigo.getText().toString();
         String cnpj = edtCNPJ.getText().toString();
+        String cidade = endereco.getCidade();
         Boolean isEmpresa = false;
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
         Empresa empresa;
@@ -91,11 +100,19 @@ public class NovaEmpresaActivity extends AppCompatActivity {
             if (nome.trim().isEmpty() || fantasia.trim().isEmpty() || codigo.trim().isEmpty() || cnpj.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                empresa = new Empresa(nome, fantasia, codigo, cnpj);
-                collectionReference.document(codigo).set(empresa);
+                empresa = new Empresa(nome, fantasia, codigo, cnpj, endereco);
+                collectionReference.document(codigo + " - " + fantasia + " " + cidade).collection("Sobre").document(codigo + " - " + fantasia + " " + cidade).set(empresa);
+                // Seta dados do documento para ativá-lo e facilitar nas buscas
+                Map<String, Object> map = new HashMap<>();
+                map.put("codigo", codigo);
+                map.put("fantasia", fantasia);
+                map.put("cnpj", cnpj);
+                collectionReference.document(codigo + " - " + fantasia + " " + cidade).set(map);
+
                 Toast.makeText(getApplicationContext(), getString(R.string.empresa_salva), Toast.LENGTH_SHORT).show();
                 getListEmpresas();
                 isEmpresa = true;
+                finish();
             }
         }
     }
@@ -123,5 +140,41 @@ public class NovaEmpresaActivity extends AppCompatActivity {
                 listEmpresas = list;
             }
         });
+    }
+
+    public void getSpinnerEnderecos() {
+        final ArrayList<Endereco> list = new ArrayList<>();
+        CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
+
+        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Endereco endereco = documentSnapshot.toObject(Endereco.class);
+                    list.add(endereco);
+                }
+
+                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                spnEndereco.setAdapter(adapter);
+
+                spnEndereco.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getSpinnerEnderecos();
     }
 }

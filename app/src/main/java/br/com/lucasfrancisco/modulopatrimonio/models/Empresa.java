@@ -5,6 +5,7 @@ public class Empresa {
     private String fantasia;
     private String codigo;
     private String CNPJ;
+    private Endereco endereco;
 
     public Empresa() {
     }
@@ -14,6 +15,14 @@ public class Empresa {
         this.fantasia = fantasia;
         this.codigo = codigo;
         this.CNPJ = CNPJ;
+    }
+
+    public Empresa(String nome, String fantasia, String codigo, String CNPJ, Endereco endereco) {
+        this.nome = nome;
+        this.fantasia = fantasia;
+        this.codigo = codigo;
+        this.CNPJ = CNPJ;
+        this.endereco = endereco;
     }
 
     public String getNome() {
@@ -46,5 +55,18 @@ public class Empresa {
 
     public void setCNPJ(String CNPJ) {
         this.CNPJ = CNPJ;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+
+    @Override
+    public String toString() {
+        return this.codigo + " - " + this.fantasia + " " + this.endereco.getCidade();
     }
 }

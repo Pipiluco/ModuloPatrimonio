@@ -9,6 +9,12 @@
         app:showAsAction="withText" />
 
     <item
+        android:id="@+id/itSalvar"
+        android:icon="@drawable/ic_save"
+        android:title="@string/salvar"
+        app:showAsAction="withText" />
+
+    <item
         android:id="@+id/itExcluir"
         android:icon="@drawable/ic_delete"
         android:title="@string/excluir"

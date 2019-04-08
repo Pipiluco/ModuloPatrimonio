@@ -57,7 +57,7 @@ public class NovoObjetoActivity extends AppCompatActivity {
         //
 
         setor.setBloco("Bloco B");
-        setor.setSetor("Sala de aula");
+        setor.setNome("Sala de aula");
         setor.setSala("B-02");
 
         //
