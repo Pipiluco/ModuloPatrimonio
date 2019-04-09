@@ -35,7 +35,9 @@
         <activity
             android:name=".activities.EnderecoActivity"
             android:parentActivityName=".activities.MainActivity" />
-        <activity android:name=".activities.NovoSetorActivity" />
+        <activity
+            android:name=".activities.NovoSetorActivity"
+            android:parentActivityName=".activities.MainActivity" />
     </application>
 
 </manifest>

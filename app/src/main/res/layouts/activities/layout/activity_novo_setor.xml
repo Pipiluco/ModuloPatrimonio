@@ -15,19 +15,19 @@
         android:spinnerMode="dialog" />
 
     <EditText
-        android:id="@+id/edtNome"
+        android:id="@+id/edtTipo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/spnEmpresa"
         android:ems="10"
-        android:hint="@string/nome"
+        android:hint="@string/tipo"
         android:inputType="textMultiLine" />
 
     <EditText
         android:id="@+id/edtBloco"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edtNome"
+        android:layout_below="@+id/edtTipo"
         android:ems="10"
         android:hint="@string/bloco"
         android:inputType="text" />

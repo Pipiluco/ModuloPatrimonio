@@ -1,5 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,7 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
 public class NovoSetorActivity extends AppCompatActivity {
     private Spinner spnEmpresa;
-    private EditText edtNome, edtBloco, edtSala;
+    private EditText edtTipo, edtBloco, edtSala;
     private FloatingActionButton fabNovaEmpresa;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -46,10 +47,12 @@ public class NovoSetorActivity extends AppCompatActivity {
         setTitle(getString(R.string.novo_setor));
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
-        edtNome = (EditText) findViewById(R.id.edtNome);
+        edtTipo = (EditText) findViewById(R.id.edtTipo);
         edtBloco = (EditText) findViewById(R.id.edtBloco);
         edtSala = (EditText) findViewById(R.id.edtSala);
         fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
+
+        getFabNovaEmpresa();
     }
 
     @Override
@@ -79,7 +82,7 @@ public class NovoSetorActivity extends AppCompatActivity {
 
         Empresa empresa = (Empresa) spnEmpresa.getSelectedItem();
         String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
-        String nome = edtNome.getText().toString();
+        String tipo = edtTipo.getText().toString();
         String bloco = edtBloco.getText().toString();
         String sala = edtSala.getText().toString();
         Boolean isSetor = false;
@@ -94,10 +97,10 @@ public class NovoSetorActivity extends AppCompatActivity {
         }
 
         if (!isSetor) {
-            if (nome.trim().isEmpty() || bloco.trim().isEmpty() || sala.trim().isEmpty()) {
+            if (tipo.trim().isEmpty() || bloco.trim().isEmpty() || sala.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                setor = new Setor(bloco, nome, sala, empresa);
+                setor = new Setor(bloco, tipo, sala, empresa);
                 collectionReference.document(nomeEmpresa).collection("Setores").document(bloco + " - " + sala).set(setor);
                 Toast.makeText(getApplicationContext(), getString(R.string.setor_salvo), Toast.LENGTH_SHORT).show();
                 getListSetores();
@@ -155,6 +158,16 @@ public class NovoSetorActivity extends AppCompatActivity {
                     list.add(documentSnapshot.getId());
                 }
                 listSetores = list;
+            }
+        });
+    }
+
+    public void getFabNovaEmpresa() {
+        fabNovaEmpresa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                startActivity(intent);
             }
         });
     }

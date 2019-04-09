@@ -2,7 +2,7 @@ package br.com.lucasfrancisco.modulopatrimonio.models;
 
 public class Setor {
     private String bloco;
-    private String nome;
+    private String tipo;
     private String sala;
     private Empresa empresa;
 
@@ -11,13 +11,13 @@ public class Setor {
 
     public Setor(String bloco, String nome, String sala) {
         this.bloco = bloco;
-        this.nome = nome;
+        this.tipo = nome;
         this.sala = sala;
     }
 
     public Setor(String bloco, String nome, String sala, Empresa empresa) {
         this.bloco = bloco;
-        this.nome = nome;
+        this.tipo = nome;
         this.sala = sala;
         this.empresa = empresa;
     }
@@ -30,12 +30,12 @@ public class Setor {
         this.bloco = bloco;
     }
 
-    public String getNome() {
-        return nome;
+    public String getTipo() {
+        return tipo;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getSala() {
@@ -52,5 +52,10 @@ public class Setor {
 
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
+    }
+
+    @Override
+    public String toString() {
+        return this.bloco + " - " + this.sala;
     }
 }

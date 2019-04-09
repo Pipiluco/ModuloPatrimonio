@@ -6,10 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -100,6 +102,56 @@ public class EnderecoFragment extends Fragment {
     }
 
     public void pesquisar(String pesquisa) {
+        ArrayList<String> listResultado = new ArrayList<>();
+
+        for (int i = 0; i < listEnderecos.size(); i++) {
+            if (listEnderecos.get(i).toLowerCase().contains(pesquisa.toLowerCase())) {
+                Log.d("Endereco", listEnderecos.get(i));
+                listResultado.add(listEnderecos.get(i));
+            }
+        }
+
+        if (listResultado.size() > 0){
+
+        }
+
+
+        //listEnderecos.get(i).contains(pesquisa)
+    }
+
+    public void pesquisar3(String pesquisa) {
+        Query query = collectionReference.orderBy("cep").startAt(pesquisa).endAt(pesquisa + "\uf8ff");
+        FirestoreRecyclerOptions<Endereco> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Endereco>().setQuery(query, Endereco.class).build();
+        enderecoAdapter = new EnderecoAdapter(firestoreRecyclerOptions);
+
+        rcyEnderecos.setHasFixedSize(true);
+        rcyEnderecos.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rcyEnderecos.setAdapter(enderecoAdapter);
+
+        enderecoAdapter.startListening();
+
+        // getAdapterItemTouch();
+        getRecyclerViewClickListener();
+    }
+
+    public void getListEnderecos() {
+        final ArrayList<String> list = new ArrayList<>();
+        CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
+
+        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Endereco endereco = documentSnapshot.toObject(Endereco.class);
+                    list.add(endereco.getCEP() + " " + endereco.getRua() + " " + endereco.getCidade() + " " + endereco.getEstado());
+                }
+                listEnderecos = list;
+            }
+        });
+    }
+
+    //
+    public void pesquisar2(String pesquisa) {
         if (listEnderecos.contains(pesquisa)) {
             Query query = collectionReference.whereEqualTo("cep", pesquisa);
             FirestoreRecyclerOptions<Endereco> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Endereco>().setQuery(query, Endereco.class).build();
@@ -117,6 +169,7 @@ public class EnderecoFragment extends Fragment {
             Toast.makeText(getActivity(), getString(R.string.endereco_nao_encontrado), Toast.LENGTH_SHORT).show();
         }
     }
+    //
 
     public void getRecyclerViewClickListener() {
         enderecoAdapter.setRecyclerViewClickListener(new RecyclerViewClickListener() {
@@ -140,7 +193,7 @@ public class EnderecoFragment extends Fragment {
         });
     }
 
-    public void getListEnderecos() {
+    public void getListEnderecos2() {
         final ArrayList<String> list = new ArrayList<>();
         CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
 

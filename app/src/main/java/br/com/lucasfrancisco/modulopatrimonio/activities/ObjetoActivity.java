@@ -40,7 +40,7 @@ public class ObjetoActivity extends AppCompatActivity {
         String marca = edtMarca.getText().toString();
         String modelo = edtModelo.getText().toString();
         String cor = edtCor.getText().toString();
-        Objeto objeto = new Objeto(tipo, marca, modelo, cor);
+        Objeto objeto = new Objeto(tipo, marca, modelo);
 
         objetosCollectionReference.add(objeto);
     }

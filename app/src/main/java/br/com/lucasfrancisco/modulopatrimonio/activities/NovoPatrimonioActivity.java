@@ -26,6 +26,7 @@ import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
+import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
 public class NovoPatrimonioActivity extends AppCompatActivity {
     private Spinner spnEmpresa, spnSetor;
@@ -36,7 +37,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
     private ArrayAdapter adapter;
     private ArrayList<String> listEmpresas;
-    private ArrayList<String> listSetores;
+    //private ArrayList<String> listSetores;
     private ArrayList<String> listPatrimonios;
 
     @Override
@@ -58,7 +59,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
         fabNovoSetor = (FloatingActionButton) findViewById(R.id.fabNovoSetor);
 
-        spinnerEmpresas();
+        getSpinnerEmpresas();
         getFabNovaEmpresa();
         getFabNovoSetor();
     }
@@ -92,8 +93,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             return;
         }
 
-        String empresa = spnEmpresa.getSelectedItem().toString();
-        String setor = spnSetor.getSelectedItem().toString();
+        Setor setor = (Setor) spnSetor.getSelectedItem();
+        String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
         String plaqueta = edtPlaqueta.getText().toString();
         String tipo = edtTipo.getText().toString();
         String marca = edtMarca.getText().toString();
@@ -115,11 +116,17 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                patrimonio = new Patrimonio(empresa, setor, plaqueta, true, tipo, marca, modelo);
-                collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor);
+                collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                 Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                 getListPatrimonios();
                 isPatrimonio = true;
+
+                // Limpa campos de texto
+                edtPlaqueta.setText("");
+                edtTipo.setText("");
+                edtMarca.setText("");
+                edtModelo.setText("");
             }
         }
     }
@@ -159,7 +166,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
-    public void spinnerEmpresas() {
+    public void getSpinnerEmpresas() {
         final ArrayList<String> list = new ArrayList<>();
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
@@ -177,7 +184,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 spnEmpresa.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        spinnerSetores();
+                        getSpinnerSetores();
                     }
 
                     @Override
@@ -189,19 +196,20 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
-    public void spinnerSetores() {
-        final ArrayList<String> list = new ArrayList<>();
+    public void getSpinnerSetores() {
+        final ArrayList<Setor> list = new ArrayList<>();
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas").document(spnEmpresa.getSelectedItem().toString()).collection("Setores");
 
         collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    list.add(documentSnapshot.getId());
+                    Setor setor = documentSnapshot.toObject(Setor.class);
+                    list.add(setor);
                 }
 
-                listSetores = list;
-                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, listSetores);
+                //listSetores = list;
+                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
                 spnSetor.setAdapter(adapter);
 
                 spnSetor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

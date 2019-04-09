@@ -24,7 +24,6 @@ public class ObjetoAdapter extends FirestoreRecyclerAdapter<Objeto, ObjetoAdapte
     @Override
     protected void onBindViewHolder(@NonNull ObjetoHolder holder, int position, @NonNull Objeto model) {
         holder.tvTipo.setText(model.getTipo());
-        holder.tvCor.setText(String.valueOf(model.getCor()));
         holder.tvMarca.setText(model.getMarca());
         holder.tvModelo.setText(model.getModelo());
     }

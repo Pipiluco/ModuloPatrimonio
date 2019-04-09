@@ -37,7 +37,6 @@ public class NovoObjetoActivity extends AppCompatActivity {
         objeto.setTipo("Computador");
         objeto.setMarca("Dell");
         objeto.setModelo("Vostro 3460");
-        objeto.setCor("Preto");
 
         //
         endereco.setRua("Alexandre Osvald Tarnowski");
@@ -57,7 +56,7 @@ public class NovoObjetoActivity extends AppCompatActivity {
         //
 
         setor.setBloco("Bloco B");
-        setor.setNome("Sala de aula");
+        setor.setTipo("Sala de aula");
         setor.setSala("B-02");
 
         //

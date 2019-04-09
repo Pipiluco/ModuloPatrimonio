@@ -23,10 +23,12 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
 
     @Override
     protected void onBindViewHolder(@NonNull PatrimonioHolder holder, int position, @NonNull Patrimonio model) {
+        String empresa = model.getSetor().getEmpresa().getFantasia() + " " + model.getSetor().getEmpresa().getEndereco().getCidade();
+        String setor = model.getSetor().getBloco() + " - " + model.getSetor().getSala();
         holder.tvPlaqueta.setText(model.getPlaqueta());
-        holder.tvEmpresa.setText(model.getEmpresa());
+        holder.tvEmpresa.setText(empresa);
         holder.tvTipo.setText(model.getTipo());
-        holder.tvSetor.setText(model.getSetor());
+        holder.tvSetor.setText(setor);
     }
 
     @NonNull
