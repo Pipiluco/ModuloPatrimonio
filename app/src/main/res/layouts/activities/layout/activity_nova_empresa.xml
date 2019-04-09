@@ -46,6 +46,8 @@
         android:id="@+id/spnEndereco"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:prompt="@string/escolha_endereco"
+        android:spinnerMode="dialog"
         android:layout_below="@+id/edtCNPJ" />
 
     <com.github.clans.fab.FloatingActionMenu

@@ -63,11 +63,10 @@ public class EnderecoFragment extends Fragment {
 
         getListEnderecos();
         // Métodos para eventos
-        getRcyEnderecos();
+        //getRcyEnderecos();
         getRecyclerViewClickListener();
         getFabXls();
         getFabNovo();
-
 
         return view;
     }

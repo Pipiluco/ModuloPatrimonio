@@ -53,6 +53,7 @@
     <string name="endereco_nao_encontrado">Endereço não encontrado!</string>
     <string name="endereco_salvo">Endereço salvo!</string>
     <string name="escolha_empresa">Escolha uma empresa</string>
+    <string name="escolha_endereco">Escolha um endereço</string>
     <string name="escolha_setor">Escolha um setor</string>
     <string name="necessario_empresa">É necessário criar uma empresa!</string>
     <string name="necessario_setor">É necessário criar um setor!</string>
@@ -63,6 +64,8 @@
     <string name="dados_incompletos">Dados incompletos!</string>
     <string name="patrimonio_ja_existe">Já existe patrimônio salvo com esta plaqueta!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
+    <string name="setor_ja_existe">Já existe setor salvo com estas informações!</string>
+    <string name="setor_salvo">Setor salvo!</string>
     <string name="navigation_drawer_open">Abre Naigation Drawer</string>
     <string name="navigation_drawer_close">Fecha Naigation Drawer</string>
 

@@ -9,6 +9,12 @@ public class Setor {
     public Setor() {
     }
 
+    public Setor(String bloco, String nome, String sala) {
+        this.bloco = bloco;
+        this.nome = nome;
+        this.sala = sala;
+    }
+
     public Setor(String bloco, String nome, String sala, Empresa empresa) {
         this.bloco = bloco;
         this.nome = nome;
