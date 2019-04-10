@@ -18,14 +18,18 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.EnderecoActivity;
@@ -101,7 +105,25 @@ public class EnderecoFragment extends Fragment {
         }
     }
 
+
     public void pesquisar(String pesquisa) {
+        Query query = collectionReference.orderBy("cep").startAt(pesquisa).endAt(pesquisa + "\uf8ff");
+        Log.d("QUERY", query.toString());
+        FirestoreRecyclerOptions<Endereco> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Endereco>().setQuery(query, Endereco.class).build();
+        enderecoAdapter = new EnderecoAdapter(firestoreRecyclerOptions);
+
+        rcyEnderecos.setHasFixedSize(true);
+        rcyEnderecos.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rcyEnderecos.setAdapter(enderecoAdapter);
+
+        enderecoAdapter.startListening();
+
+        // getAdapterItemTouch();
+        getRecyclerViewClickListener();
+    }
+    //////////////////////
+
+    public void pesquisar4(String pesquisa) {
         ArrayList<String> listResultado = new ArrayList<>();
 
         for (int i = 0; i < listEnderecos.size(); i++) {

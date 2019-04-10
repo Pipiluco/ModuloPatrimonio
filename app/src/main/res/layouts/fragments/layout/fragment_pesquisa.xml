@@ -10,14 +10,16 @@
         android:id="@+id/edtPesquisa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/imvPesquisar"
+        android:layout_toStartOf="@+id/spnFiltro"
         android:hint="@string/pesquisar" />
 
-    <ImageView
-        android:id="@+id/imvPesquisar"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+    <Spinner
+        android:id="@+id/spnFiltro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_search" />
+        android:prompt="@string/escolha_filtro"
+        android:spinnerMode="dialog" />
+
 </RelativeLayout>

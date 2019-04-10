@@ -54,6 +54,7 @@
     <string name="endereco_salvo">Endereço salvo!</string>
     <string name="escolha_empresa">Escolha uma empresa</string>
     <string name="escolha_endereco">Escolha um endereço</string>
+    <string name="escolha_filtro">Escolha um filtro</string>
     <string name="escolha_setor">Escolha um setor</string>
     <string name="necessario_empresa">É necessário criar uma empresa!</string>
     <string name="necessario_setor">É necessário criar um setor!</string>
