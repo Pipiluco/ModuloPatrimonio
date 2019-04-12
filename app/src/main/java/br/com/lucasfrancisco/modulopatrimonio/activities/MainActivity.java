@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onSetText(String texto, String filtro) {
+    public void onSetText(String texto, String filtro, long limite) {
         Fragment fragment = getFragment();
 
         if (fragment instanceof PatrimonioFragment) {
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             empresaFragment.getTextPesquisa(texto, filtro);
         } else if (fragment instanceof EnderecoFragment) {
             EnderecoFragment enderecoFragment = (EnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            enderecoFragment.getTextPesquisa(texto, filtro);
+            enderecoFragment.getTextPesquisa(texto, filtro, limite);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }

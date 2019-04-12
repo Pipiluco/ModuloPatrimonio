@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.NumberPicker;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
     private CommunicatePesquisaFragment communicatePesquisaFragment;
     private ArrayList<String> listFilter;
     private SearchView shvPesquisa;
+    private NumberPicker npLimite;
     private Spinner spnFiltro;
 
     @Override
@@ -59,6 +61,7 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
 
         MenuItem itPesquisa = menu.findItem(R.id.itPesquisa);
         MenuItem itFiltro = menu.findItem(R.id.itFiltro);
+        MenuItem itLimite = menu.findItem(R.id.itLimite);
 
         shvPesquisa = (SearchView) itPesquisa.getActionView();
         shvPesquisa.setOnQueryTextListener(this);
@@ -67,6 +70,10 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
         ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, listFilter);
         spnFiltro = (Spinner) itFiltro.getActionView();
         spnFiltro.setAdapter(adapter);
+
+        npLimite = (NumberPicker) itLimite.getActionView();
+        npLimite.setMinValue(1);
+        npLimite.setMaxValue(100);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -80,7 +87,8 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
     public boolean onQueryTextChange(String newText) {
         if (newText != null || !newText.trim().isEmpty() || communicatePesquisaFragment != null) {
             String filter = spnFiltro.getSelectedItem().toString();
-            communicatePesquisaFragment.onSetText(newText, filter);
+            int limit = npLimite.getValue();
+            communicatePesquisaFragment.onSetText(newText, filter, limit);
         }
         return false;
     }

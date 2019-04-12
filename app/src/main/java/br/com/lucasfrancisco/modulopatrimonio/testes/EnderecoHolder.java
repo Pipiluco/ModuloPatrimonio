@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.holderes;
+package br.com.lucasfrancisco.modulopatrimonio.testes;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

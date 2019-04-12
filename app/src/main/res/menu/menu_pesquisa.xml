@@ -8,12 +8,20 @@
         android:orderInCategory="1"
         android:title="@string/filtro"
         app:actionViewClass="android.widget.Spinner"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/itLimite"
+        android:orderInCategory="2"
+        android:title="@string/limite"
+        app:actionViewClass="android.widget.NumberPicker"
+        app:showAsAction="collapseActionView" />
 
     <item
         android:id="@+id/itPesquisa"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:title="@string/pesquisa"
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
 </menu>
