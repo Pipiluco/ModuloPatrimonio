@@ -59,7 +59,7 @@ public class PatrimonioFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_patrimonio, container, false);
         communicatePesquisaFragment.onSetFilter(setListFiltros());
 
-        Query query = collectionReference.document("4082").collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
+        Query query = collectionReference.document("4081 - SENAI Indaial").collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
         firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
         patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
 
@@ -244,39 +244,36 @@ public class PatrimonioFragment extends Fragment {
         }).attachToRecyclerView(rcyPatrimonios);
     }
 
-    public void pesquisar(String s) {
-        if (!empresaEscolhida.equals("")) {
-            Log.d("Empresa", empresaEscolhida);
-            Query query = collectionReference.document(empresaEscolhida).collection("Patrimonios").whereEqualTo("plaqueta", s);
-            FirestoreRecyclerOptions<Patrimonio> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
-            patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
-
-            rcyPatrimonios.setHasFixedSize(true);
-            rcyPatrimonios.setLayoutManager(new LinearLayoutManager(getActivity()));
-            rcyPatrimonios.setAdapter(patrimonioAdapter);
-
-            patrimonioAdapter.startListening();
-
-            getAdapterItemTouch();
-            getAdapterItemClick();
-        } else {
-            Toast.makeText(getActivity(), "Nenhuma empresa escolhida!", Toast.LENGTH_SHORT).show();
+    public void pesquisar(String pesquisa, String empresa, long limite) {
+        if (!pesquisa.equals("")) {
+            pesquisa = pesquisa.substring(0, 1).toUpperCase().concat(pesquisa.substring(1));
         }
+
+        Query queryLocal = collectionReference.document(empresa).collection("Patrimonios").orderBy("plaqueta").startAt(pesquisa).endAt(pesquisa + "\uf8ff").limit(limite);
+        FirestoreRecyclerOptions<Patrimonio> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(queryLocal, Patrimonio.class).build();
+        patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
+
+        rcyPatrimonios.setHasFixedSize(true);
+        rcyPatrimonios.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rcyPatrimonios.setAdapter(patrimonioAdapter);
+
+        patrimonioAdapter.startListening();
+
+        getAdapterItemTouch();
+        getAdapterItemClick();
     }
 
 
     // Dados entre Fragments
-    public void getTextPesquisa(String texto, String filtro) {
-        if (texto != null) {
-            pesquisar(texto);
-        }
+    public void getTextPesquisa(String pesquisa, String empresa, long limite) {
+
     }
 
     public ArrayList<String> setListFiltros() {
         ArrayList<String> listFiltros = new ArrayList<>();
-        listFiltros.add("Plaqueta");
-        listFiltros.add("Tipo");
-        listFiltros.add("Empresa");
+        listFiltros.add("4081 - SENAI Indaial");
+        listFiltros.add("4082 - SENAI Pomerode");
+        listFiltros.add("4092 - SENAI Timbó");
 
         return listFiltros;
     }

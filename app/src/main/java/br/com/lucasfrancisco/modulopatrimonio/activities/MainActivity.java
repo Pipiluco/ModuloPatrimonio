@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (fragment instanceof PatrimonioFragment) {
             PatrimonioFragment patrimonioFragment = (PatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            patrimonioFragment.getTextPesquisa(texto, filtro);
+            patrimonioFragment.pesquisar(texto, filtro, limite);
         } else if (fragment instanceof EmpresaFragment) {
             EmpresaFragment empresaFragment = (EmpresaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             empresaFragment.getTextPesquisa(texto, filtro);
