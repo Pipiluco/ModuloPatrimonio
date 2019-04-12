@@ -1,5 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +29,14 @@ import java.util.ArrayList;
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovaEmpresaActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EmpresaAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 
 public class EmpresaFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+
+    private CommunicatePesquisaFragment communicatePesquisaFragment;
 
     private EmpresaAdapter empresaAdapter;
 
@@ -44,6 +49,8 @@ public class EmpresaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_empresa, container, false);
+        communicatePesquisaFragment.onSetFilter(setListFiltros());
+
         Query query = collectionReference.orderBy("codigo", Query.Direction.ASCENDING);
         FirestoreRecyclerOptions<Empresa> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Empresa>().setQuery(query, Empresa.class).build();
         empresaAdapter = new EmpresaAdapter(firestoreRecyclerOptions);
@@ -67,7 +74,6 @@ public class EmpresaFragment extends Fragment {
 
         return view;
     }
-
 
     public void pesquisar(String pesquisa) {
         if (listEmpresas.contains(pesquisa)) {
@@ -99,7 +105,7 @@ public class EmpresaFragment extends Fragment {
                     collectionReference.document(documentSnapshot.getId()).collection("Sobre").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
+                            for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
                                 Empresa empresa = snapshot.toObject(Empresa.class);
                                 list.add(empresa.getCodigo());
                             }
@@ -156,6 +162,18 @@ public class EmpresaFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            communicatePesquisaFragment = (CommunicatePesquisaFragment) context;
+        } catch (Exception e) {
+            Log.w("EmpresaFragment", e.toString());
+            Toast.makeText(getActivity(), "Erro: " + e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         empresaAdapter.startListening();
@@ -168,9 +186,18 @@ public class EmpresaFragment extends Fragment {
     }
 
     // Dados entre Fragments
-    public void getTextPesquisa(String texto) {
+    public void getTextPesquisa(String texto, String filtro) {
         if (texto != null) {
             pesquisar(texto);
         }
+    }
+
+    public ArrayList<String> setListFiltros() {
+        ArrayList<String> listFiltros = new ArrayList<>();
+        listFiltros.add("CNPJ");
+        listFiltros.add("Código");
+        listFiltros.add("Fantasia");
+
+        return listFiltros;
     }
 }

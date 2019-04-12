@@ -15,6 +15,7 @@
     <string name="modelo">Modelo</string>
     <string name="numero">Número</string>
     <string name="pais">País</string>
+    <string name="pesquisa">Pesquisa</string>
     <string name="plaqueta">Plaqueta</string>
     <string name="rua">Rua</string>
     <string name="sala">Sala</string>
@@ -65,6 +66,7 @@
     <string name="dados_incompletos">Dados incompletos!</string>
     <string name="patrimonio_ja_existe">Já existe patrimônio salvo com esta plaqueta!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
+    <string name="sem_resultado">Sem resultado!</string>
     <string name="setor_ja_existe">Já existe setor salvo com estas informações!</string>
     <string name="setor_salvo">Setor salvo!</string>
     <string name="navigation_drawer_open">Abre Naigation Drawer</string>

@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
@@ -104,21 +106,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onSetText(String texto) {
+    public void onSetText(String texto, String filtro) {
         Fragment fragment = getFragment();
 
         if (fragment instanceof PatrimonioFragment) {
             PatrimonioFragment patrimonioFragment = (PatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            patrimonioFragment.getTextPesquisa(texto);
+            patrimonioFragment.getTextPesquisa(texto, filtro);
         } else if (fragment instanceof EmpresaFragment) {
             EmpresaFragment empresaFragment = (EmpresaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            empresaFragment.getTextPesquisa(texto);
+            empresaFragment.getTextPesquisa(texto, filtro);
         } else if (fragment instanceof EnderecoFragment) {
             EnderecoFragment enderecoFragment = (EnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            enderecoFragment.getTextPesquisa(texto);
+            enderecoFragment.getTextPesquisa(texto, filtro);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }
+    }
+
+    @Override
+    public void onSetFilter(ArrayList arrayList) {
+        PesquisaFragment pesquisaFragment = (PesquisaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlPesquisa);
+        pesquisaFragment.setFilter(arrayList);
     }
 }
 

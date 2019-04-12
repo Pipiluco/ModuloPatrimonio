@@ -1,5 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,11 +34,14 @@ import java.util.ArrayList;
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+
+    private CommunicatePesquisaFragment communicatePesquisaFragment;
 
     private PatrimonioAdapter patrimonioAdapter;
     private FirestoreRecyclerOptions<Patrimonio> firestoreRecyclerOptions;
@@ -52,7 +56,8 @@ public class PatrimonioFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_patrimonio, container, false);
+        View view = inflater.inflate(R.layout.fragment_patrimonio, container, false);
+        communicatePesquisaFragment.onSetFilter(setListFiltros());
 
         Query query = collectionReference.document("4082").collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
         firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
@@ -191,6 +196,18 @@ public class PatrimonioFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            communicatePesquisaFragment = (CommunicatePesquisaFragment) context;
+        } catch (Exception e) {
+            Log.w("PatrimonioFragment", e.toString());
+            Toast.makeText(getActivity(), "Erro: " + e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         patrimonioAdapter.startListening();
@@ -249,10 +266,19 @@ public class PatrimonioFragment extends Fragment {
 
 
     // Dados entre Fragments
-    public void getTextPesquisa(String texto) {
+    public void getTextPesquisa(String texto, String filtro) {
         if (texto != null) {
             pesquisar(texto);
         }
+    }
+
+    public ArrayList<String> setListFiltros() {
+        ArrayList<String> listFiltros = new ArrayList<>();
+        listFiltros.add("Plaqueta");
+        listFiltros.add("Tipo");
+        listFiltros.add("Empresa");
+
+        return listFiltros;
     }
 }
 

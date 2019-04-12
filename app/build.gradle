@@ -61,6 +61,7 @@ dependencies {
 
     //
     implementation "android.arch.core:runtime:1.1.1"
+    implementation "android.arch.paging:runtime:1.0.1" // Paginação com FirestoreRecyclerAdapter
 
     // Para a paleta de cores
     implementation 'com.github.yukuku:ambilwarna:2.0.1'
