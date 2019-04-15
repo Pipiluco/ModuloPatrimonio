@@ -66,6 +66,9 @@ dependencies {
     // Para a paleta de cores
     implementation 'com.github.yukuku:ambilwarna:2.0.1'
 
+    // JSON
+    implementation 'com.google.code.gson:gson:2.8.5'
+
     // Para Floating Action Menu
     implementation 'com.github.clans:fab:1.6.4'
 

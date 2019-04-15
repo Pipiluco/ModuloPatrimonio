@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,11 +32,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
+import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.BancoController;
+import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.SelectSQLite;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
+import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioFragment extends Fragment {
@@ -244,7 +251,12 @@ public class PatrimonioFragment extends Fragment {
         }).attachToRecyclerView(rcyPatrimonios);
     }
 
+    // Dados entre Fragments
     public void pesquisar(String pesquisa, String empresa, long limite) {
+        for (int i = 0; i < setListFiltros().size(); i++) {
+
+        }
+
         if (!pesquisa.equals("")) {
             pesquisa = pesquisa.substring(0, 1).toUpperCase().concat(pesquisa.substring(1));
         }
@@ -263,17 +275,16 @@ public class PatrimonioFragment extends Fragment {
         getAdapterItemClick();
     }
 
-
-    // Dados entre Fragments
-    public void getTextPesquisa(String pesquisa, String empresa, long limite) {
-
-    }
-
     public ArrayList<String> setListFiltros() {
         ArrayList<String> listFiltros = new ArrayList<>();
         listFiltros.add("4081 - SENAI Indaial");
         listFiltros.add("4082 - SENAI Pomerode");
         listFiltros.add("4092 - SENAI Timbó");
+
+        // sontinuar daqui
+        SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
+        sharedPreferencesEmpresa.buscarEmpresas(getContext());
+        //
 
         return listFiltros;
     }

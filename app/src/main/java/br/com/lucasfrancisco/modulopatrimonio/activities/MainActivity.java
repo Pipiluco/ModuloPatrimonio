@@ -17,6 +17,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
+import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.InsertSQLite;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
@@ -57,6 +59,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
+        sharedPreferencesEmpresa.inserirEmpresas(getApplicationContext());
     }
 
     @Override

@@ -94,11 +94,6 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
     }
 
     public void setFilter(ArrayList arrayList) {
-
-        Log.d("Pesquisa", "" + arrayList.size());
-        for (int i = 0; i < arrayList.size(); i++) {
-            Log.d("Filtro", arrayList.get(i).toString());
-        }
         listFilter = arrayList;
     }
 }
