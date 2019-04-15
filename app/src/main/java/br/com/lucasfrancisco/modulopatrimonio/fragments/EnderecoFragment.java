@@ -25,7 +25,7 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.EnderecoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.EditEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
@@ -70,6 +70,7 @@ public class EnderecoFragment extends Fragment {
         // Métodos para eventos
         getFabXls();
         getFabNovo();
+        getRecyclerViewClickListener();
 
         return view;
     }
@@ -116,7 +117,7 @@ public class EnderecoFragment extends Fragment {
 
 
     public void pesquisar(String pesquisa, String filtro, long limite) {
-        if (!pesquisa.equals("")){
+        if (!pesquisa.equals("")) {
             pesquisa = pesquisa.substring(0, 1).toUpperCase().concat(pesquisa.substring(1));
         }
         filtro = filtro.toLowerCase();
@@ -141,7 +142,7 @@ public class EnderecoFragment extends Fragment {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Endereco endereco = documentSnapshot.toObject(Endereco.class);
-                Intent intent = new Intent(getActivity(), EnderecoActivity.class);
+                Intent intent = new Intent(getActivity(), EditEnderecoActivity.class);
                 intent.putExtra("endereco", endereco);
                 startActivity(intent);
 
@@ -176,13 +177,6 @@ public class EnderecoFragment extends Fragment {
                 startActivity(intent);
             }
         });
-    }
-
-    public void getTextPesquisa(String texto, String filtro, long limite) {
-        Log.d("Pesquisa:", texto + " Filtro: " + filtro);
-        if (texto != null) {
-            pesquisar(texto, filtro, limite);
-        }
     }
 
     public ArrayList<String> setListFiltros() {

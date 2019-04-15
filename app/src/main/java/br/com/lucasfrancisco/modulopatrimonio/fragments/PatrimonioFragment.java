@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,7 +22,6 @@ import android.widget.Toast;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,16 +30,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.EditPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
-import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.BancoController;
-import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.SelectSQLite;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
-import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioFragment extends Fragment {
@@ -79,7 +75,25 @@ public class PatrimonioFragment extends Fragment {
         fabXls = (FloatingActionButton) view.findViewById(R.id.fabXls);
         fabFiltro = (FloatingActionButton) view.findViewById(R.id.fabFiltro);
 
+        // Métodos de eventos
+        getFabFiltro();
+        getFabNovo();
+        getAdapterItemTouch();
+        getRecyclerViewClickListener();
 
+        return view;
+    }
+
+    public void getFabXls() {
+        fabXls.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Exportar para XLS", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getFabNovo() {
         fabNovo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,19 +101,6 @@ public class PatrimonioFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-        fabXls.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), "Exportar para XLS", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        getFabFiltro();
-        getAdapterItemTouch();
-        getAdapterItemClick();
-
-        return view;
     }
 
     public void getFabFiltro() {
@@ -197,7 +198,7 @@ public class PatrimonioFragment extends Fragment {
                 patrimonioAdapter.startListening();
 
                 getAdapterItemTouch();
-                getAdapterItemClick();
+                getRecyclerViewClickListener();
             }
         });
     }
@@ -227,12 +228,21 @@ public class PatrimonioFragment extends Fragment {
     }
 
 
-    public void getAdapterItemClick() {
-        patrimonioAdapter.setOnItemClickListener(new PatrimonioAdapter.OnItemClickListener() {
+    public void getRecyclerViewClickListener() {
+        patrimonioAdapter.setRecyclerViewClickListener(new RecyclerViewClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
+                Intent intent = new Intent(getActivity(), EditPatrimonioActivity.class);
+                intent.putExtra("patrimonio", patrimonio);
+                startActivity(intent);
+            }
+
+            @Override
+            public boolean onItemLongClick(DocumentSnapshot documentSnapshot, int posicao) {
+                Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
                 Toast.makeText(getActivity(), "Marca: " + patrimonio.getMarca(), Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
     }
@@ -253,10 +263,15 @@ public class PatrimonioFragment extends Fragment {
 
     // Dados entre Fragments
     public void pesquisar(String pesquisa, String empresa, long limite) {
-        for (int i = 0; i < setListFiltros().size(); i++) {
+        ArrayList<String> listFiltros = setListFiltros(null);
 
+        for (int i = 0; i < listFiltros.size(); i++) {
+            if (listFiltros.get(i).contains(empresa)) {
+                empresa = listFiltros.get(i); // Recupera o id do documento através de listFiltros
+            }
         }
 
+        // Coloca a primeira letra da pesquisa em maiúsculo
         if (!pesquisa.equals("")) {
             pesquisa = pesquisa.substring(0, 1).toUpperCase().concat(pesquisa.substring(1));
         }
@@ -272,19 +287,26 @@ public class PatrimonioFragment extends Fragment {
         patrimonioAdapter.startListening();
 
         getAdapterItemTouch();
-        getAdapterItemClick();
+        getRecyclerViewClickListener();
     }
 
-    public ArrayList<String> setListFiltros() {
-        ArrayList<String> listFiltros = new ArrayList<>();
+    // Sobrecarga
+    public ArrayList<String> setListFiltros(ArrayList<String> list) {
         SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
+        ArrayList<String> listFiltros = sharedPreferencesEmpresa.buscar(getContext());
+        return listFiltros;
+    }
 
-        // Pega o nome das empresas salvas em sharedPreferencesEmpresa e joga apenas o código para o listFiltros
-        for (int i = 0; i < sharedPreferencesEmpresa.buscarEmpresas(getContext()).size(); i++) {
-            String codigo = sharedPreferencesEmpresa.buscarEmpresas(getContext()).get(i).substring(0, 4);
+    // Sobrecarga
+    public ArrayList<String> setListFiltros() {
+        SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
+        ArrayList<String> listAux = sharedPreferencesEmpresa.buscar(getContext());
+        ArrayList<String> listFiltros = new ArrayList<>();
+
+        for (int i = 0; i < listAux.size(); i++) {
+            String codigo = listAux.get(i).substring(0, 4); // Diminui as String do ArrayList para melhorar o visual do AppBar com o spnFiltro
             listFiltros.add(codigo);
         }
-
         return listFiltros;
     }
 }

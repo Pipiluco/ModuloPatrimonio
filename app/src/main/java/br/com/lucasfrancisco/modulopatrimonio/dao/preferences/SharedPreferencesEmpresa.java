@@ -17,6 +17,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.lucasfrancisco.modulopatrimonio.R;
+
 public class SharedPreferencesEmpresa {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -28,7 +30,7 @@ public class SharedPreferencesEmpresa {
     private CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
 
-    public void inserirEmpresas(final Context context) {
+    public void inserir(final Context context) {
         sharedPreferences = context.getSharedPreferences("Empresas", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         empresas = new ArrayList<>();
@@ -43,29 +45,33 @@ public class SharedPreferencesEmpresa {
                 String json = gson.toJson(empresas);
                 editor.putString("Set", json);
                 editor.commit();
-                Toast.makeText(context, "Empresas salvas!", Toast.LENGTH_SHORT).show();
+                Log.d("SharedPreferences", "Empresas salvas!");
             }
         });
     }
 
-    public ArrayList<String> buscarEmpresas(Context context) {
+    public ArrayList<String> buscar(Context context) {
         gson = new Gson();
         sharedPreferences = context.getSharedPreferences("Empresas", Context.MODE_PRIVATE);
         empresas = new ArrayList<>();
         String json = sharedPreferences.getString("Set", "");
 
-
         if (json.isEmpty()) {
-            Toast.makeText(context, "Não há empresas no arquivo Json!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.nao_ha_empresas_json), Toast.LENGTH_LONG).show();
         } else {
             Type type = new TypeToken<List<String>>() {
             }.getType();
 
             empresas = gson.fromJson(json, type);
-            for (String empresa : empresas) {
+           /* for (String empresa : empresas) {
                 Log.d("EMPRESA", empresa);
-            }
+            } */
         }
         return empresas;
+    }
+
+    public void excluir(Context context) {
+        sharedPreferences = context.getSharedPreferences("Empresas", Context.MODE_PRIVATE);
+        sharedPreferences.edit().clear().commit();
     }
 }

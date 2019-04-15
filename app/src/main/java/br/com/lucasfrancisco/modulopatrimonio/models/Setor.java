@@ -1,6 +1,8 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-public class Setor {
+import java.io.Serializable;
+
+public class Setor implements Serializable {
     private String bloco;
     private String tipo;
     private String sala;

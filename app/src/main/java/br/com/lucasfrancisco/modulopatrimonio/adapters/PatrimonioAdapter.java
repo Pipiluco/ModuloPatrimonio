@@ -9,13 +9,13 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, PatrimonioAdapter.PatrimonioHolder> {
-    private OnItemClickListener onItemClickListener;
+    private RecyclerViewClickListener recyclerViewClickListener;
 
     public PatrimonioAdapter(@NonNull FirestoreRecyclerOptions<Patrimonio> options) {
         super(options);
@@ -42,7 +42,11 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
         getSnapshots().getSnapshot(posicao).getReference().delete();
     }
 
-    class PatrimonioHolder extends RecyclerView.ViewHolder {
+    public void setRecyclerViewClickListener(RecyclerViewClickListener recyclerViewClickListener) {
+        this.recyclerViewClickListener = recyclerViewClickListener;
+    }
+
+    class PatrimonioHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView tvPlaqueta, tvEmpresa, tvTipo, tvSetor;
 
         public PatrimonioHolder(View itemView) {
@@ -53,24 +57,27 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
             tvTipo = (TextView) itemView.findViewById(R.id.tvTipo);
             tvSetor = (TextView) itemView.findViewById(R.id.tvSetor);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int posicao = getAdapterPosition();
-
-                    if (posicao != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                        onItemClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
-                    }
-                }
-            });
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
-    }
 
-    public interface OnItemClickListener {
-        void onItemClick(DocumentSnapshot documentSnapshot, int posicao);
-    }
+        @Override
+        public void onClick(View v) {
+            int posicao = getAdapterPosition();
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
+            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
+                recyclerViewClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            int posicao = getAdapterPosition();
+
+            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
+                recyclerViewClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
+            }
+            return true;
+        }
     }
 }

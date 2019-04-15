@@ -46,6 +46,8 @@
     <string name="pesquisar">Pesquisar</string>
 
     <!-- Frases -->
+    <string name="dados_incompletos">Dados incompletos!</string>
+
     <string name="empresa_ja_existe">Já existe empresa salva com este código!</string>
     <string name="empresa_nao_encontrada">Empresa não encontrada!</string>
     <string name="empresa_salva">Empresa salva!</string>
@@ -58,19 +60,25 @@
     <string name="escolha_endereco">Escolha um endereço</string>
     <string name="escolha_filtro">Escolha um filtro</string>
     <string name="escolha_setor">Escolha um setor</string>
+
+    <string name="nao_ha_empresas_json">Não há empresas no arquivo Json!</string>
+    <string name="navigation_drawer_open">Abre Naigation Drawer</string>
+    <string name="navigation_drawer_close">Fecha Naigation Drawer</string>
     <string name="necessario_empresa">É necessário criar uma empresa!</string>
     <string name="necessario_setor">É necessário criar um setor!</string>
     <string name="nova_empresa">Nova empresa</string>
     <string name="novo_endereco">Novo endereço</string>
     <string name="novo_patrimonio">Novo patrimônio</string>
     <string name="novo_setor">Novo setor</string>
-    <string name="dados_incompletos">Dados incompletos!</string>
+
+    <string name="patrimonio_atualizado">Patrimônio atualizado!</string>
+    <string name="patrimonio_excluido">Patrimônio excluído!</string>
     <string name="patrimonio_ja_existe">Já existe patrimônio salvo com esta plaqueta!</string>
+    <string name="patrimonio_nao_encontrado">Patrimônio não encontrado!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
+
     <string name="sem_resultado">Sem resultado!</string>
     <string name="setor_ja_existe">Já existe setor salvo com estas informações!</string>
     <string name="setor_salvo">Setor salvo!</string>
-    <string name="navigation_drawer_open">Abre Naigation Drawer</string>
-    <string name="navigation_drawer_close">Fecha Naigation Drawer</string>
 
 </resources>

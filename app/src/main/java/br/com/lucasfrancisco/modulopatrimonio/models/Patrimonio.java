@@ -1,6 +1,8 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-public class Patrimonio extends Objeto {
+import java.io.Serializable;
+
+public class Patrimonio extends Objeto implements Serializable {
     private String plaqueta;
     private boolean isAtivo;
     private Setor setor;

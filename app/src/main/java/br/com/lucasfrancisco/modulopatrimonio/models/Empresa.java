@@ -1,6 +1,8 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-public class Empresa {
+import java.io.Serializable;
+
+public class Empresa implements Serializable {
     private String nome;
     private String fantasia;
     private String codigo;

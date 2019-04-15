@@ -22,7 +22,7 @@ import java.util.Objects;
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 
-public class EnderecoActivity extends AppCompatActivity {
+public class EditEnderecoActivity extends AppCompatActivity {
     private EditText edtRua, edtNumero, edtCEP, edtBairro, edtCidade, edtEstado, edtPais;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -31,7 +31,7 @@ public class EnderecoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_endereco);
+        setContentView(R.layout.activity_edit_endereco);
 
         getListEnderecos();
 

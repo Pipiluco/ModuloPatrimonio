@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
-import br.com.lucasfrancisco.modulopatrimonio.dao.sqlite.InsertSQLite;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
@@ -38,6 +37,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Buscar as empresas no Firestore e salva com SharedPreferencesEmpresa
+        SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
+        sharedPreferencesEmpresa.inserir(getApplicationContext());
 
         tbMain = (Toolbar) findViewById(R.id.tbMain);
         setSupportActionBar(tbMain);
@@ -64,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-        SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
-        sharedPreferencesEmpresa.inserirEmpresas(getApplicationContext());
     }
 
     @Override
@@ -126,14 +127,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             empresaFragment.getTextPesquisa(texto, filtro);
         } else if (fragment instanceof EnderecoFragment) {
             EnderecoFragment enderecoFragment = (EnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            enderecoFragment.getTextPesquisa(texto, filtro, limite);
+            enderecoFragment.pesquisar(texto, filtro, limite);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }
     }
 
     @Override
-    public void onSetFilter(ArrayList arrayList) {
+    public void onSetFilter(ArrayList arrayList) { // Passa o ArrayList que veio dos fragments para o PesquisaFragment
         PesquisaFragment pesquisaFragment = (PesquisaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlPesquisa);
         pesquisaFragment.setFilter(arrayList);
     }
