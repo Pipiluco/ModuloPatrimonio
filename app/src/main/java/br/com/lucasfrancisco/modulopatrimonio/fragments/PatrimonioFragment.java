@@ -277,14 +277,13 @@ public class PatrimonioFragment extends Fragment {
 
     public ArrayList<String> setListFiltros() {
         ArrayList<String> listFiltros = new ArrayList<>();
-        listFiltros.add("4081 - SENAI Indaial");
-        listFiltros.add("4082 - SENAI Pomerode");
-        listFiltros.add("4092 - SENAI Timbó");
-
-        // sontinuar daqui
         SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
-        sharedPreferencesEmpresa.buscarEmpresas(getContext());
-        //
+
+        // Pega o nome das empresas salvas em sharedPreferencesEmpresa e joga apenas o código para o listFiltros
+        for (int i = 0; i < sharedPreferencesEmpresa.buscarEmpresas(getContext()).size(); i++) {
+            String codigo = sharedPreferencesEmpresa.buscarEmpresas(getContext()).get(i).substring(0, 4);
+            listFiltros.add(codigo);
+        }
 
         return listFiltros;
     }
