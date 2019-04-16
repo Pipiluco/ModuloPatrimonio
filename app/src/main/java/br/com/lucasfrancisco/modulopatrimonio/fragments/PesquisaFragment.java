@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.NumberPicker;
 import android.widget.SearchView;
@@ -23,12 +24,13 @@ import java.util.ArrayList;
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 
-public class PesquisaFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class PesquisaFragment extends Fragment implements SearchView.OnQueryTextListener, AdapterView.OnItemSelectedListener, NumberPicker.OnValueChangeListener {
     private CommunicatePesquisaFragment communicatePesquisaFragment;
     private ArrayList<String> listFilter;
     private SearchView shvPesquisa;
     private NumberPicker npLimite;
     private Spinner spnFiltro;
+    private String pesquisa = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,15 +72,18 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
         ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, listFilter);
         spnFiltro = (Spinner) itFiltro.getActionView();
         spnFiltro.setAdapter(adapter);
+        spnFiltro.setOnItemSelectedListener(this);
 
         npLimite = (NumberPicker) itLimite.getActionView();
         npLimite.setMinValue(1);
         npLimite.setMaxValue(100);
         npLimite.setValue(10); // Valor padrão
+        npLimite.setOnValueChangedListener(this);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    // SearchView
     @Override
     public boolean onQueryTextSubmit(String query) {
         return true;
@@ -87,6 +92,7 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
     @Override
     public boolean onQueryTextChange(String newText) {
         if (newText != null || !newText.trim().isEmpty() || communicatePesquisaFragment != null) {
+            pesquisa = newText;
             String filter = spnFiltro.getSelectedItem().toString();
             int limit = npLimite.getValue();
             communicatePesquisaFragment.onSetText(newText, filter, limit);
@@ -94,6 +100,24 @@ public class PesquisaFragment extends Fragment implements SearchView.OnQueryText
         return false;
     }
 
+    // Spinner
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        onQueryTextChange(pesquisa); // Quando é escolhida uma opção no spnFiltro, é acionado o método onQueryTextChange para atualizar a pesquisa
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    // NumberPicker
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+        onQueryTextChange(pesquisa); // Quando é alterado o valor de npLimite, é acionado o método onQueryTextChange para atualizar a pesquisa
+    }
+
+    // Busca o ArrayList de filtro da interface communicatePesquisaFragment por meio do MainActivity
     public void setFilter(ArrayList<String> arrayList) {
         listFilter = arrayList;
     }

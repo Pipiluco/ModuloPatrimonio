@@ -1,6 +1,8 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-public class Objeto {
+import java.io.Serializable;
+
+public class Objeto implements Serializable {
     private String tipo;
     private String marca;
     private String modelo;

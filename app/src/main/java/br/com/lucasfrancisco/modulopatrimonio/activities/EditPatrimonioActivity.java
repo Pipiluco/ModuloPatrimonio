@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
@@ -43,7 +44,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
         getListPatrimonios();
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
 
         Patrimonio patrimonio = (Patrimonio) getIntent().getSerializableExtra("patrimonio");
 
@@ -56,9 +57,14 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         edtMarca = (EditText) findViewById(R.id.edtMarca);
         edtModelo = (EditText) findViewById(R.id.edtModelo);
 
+        // Seta os valores vindos do PatrimonioFragment
+        edtPlaqueta.setText(patrimonio.getPlaqueta());
+        edtTipo.setText(patrimonio.getTipo());
+        edtMarca.setText(patrimonio.getMarca());
+        edtModelo.setText(patrimonio.getModelo());
+
         desativaEdicao();
         getSpinnerEmpresas();
-        getSpinnerSetores();
     }
 
     @Override
@@ -104,6 +110,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
     }
 
     public void atualizar() {
+        String empresaVelha = (String) getIntent().getSerializableExtra("empresa");
         String empresa = spnEmpresa.getSelectedItem().toString();
         Setor setor = (Setor) spnSetor.getSelectedItem();
         String plaqueta = edtPlaqueta.getText().toString();
@@ -117,6 +124,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
             Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
         } else {
+            collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
             patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor);
             collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
             Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
@@ -148,30 +156,46 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
     public void getSpinnerEmpresas() {
         final ArrayList<Empresa> list = new ArrayList<>();
-        CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
         collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Empresa empresa = documentSnapshot.toObject(Empresa.class);
-                    list.add(empresa);
+                    collectionReference.document(documentSnapshot.getId()).collection("Sobre").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                                Empresa empresa = snapshot.toObject(Empresa.class);
+                                list.add(empresa);
+                            }
+
+                            adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                            spnEmpresa.setAdapter(adapter);
+
+                            // Seta a empresa do patrimônio no spnEmpresa como primeiro item
+                            String empresa = (String) getIntent().getSerializableExtra("empresa");
+                            for (int i = 0; i < spnEmpresa.getCount(); i++) {
+                                if (spnEmpresa.getItemAtPosition(i).toString().equals(empresa)) {
+                                    spnEmpresa.setSelection(i);
+                                    break;
+                                }
+                            }
+
+                            spnEmpresa.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    getSpinnerSetores();
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                }
+                            });
+                        }
+                    });
                 }
-
-                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
-                spnEmpresa.setAdapter(adapter);
-
-                spnEmpresa.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        getSpinnerSetores();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
             }
         });
     }
@@ -190,6 +214,15 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
                 adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
                 spnSetor.setAdapter(adapter);
+
+                // Seta o setor do patrimônio no spnSetor como primeiro item
+                String setor = (String) getIntent().getSerializableExtra("setor");
+                for (int i = 0; i < spnSetor.getCount(); i++) {
+                    if (spnSetor.getItemAtPosition(i).toString().equals(setor)) {
+                        spnSetor.setSelection(i);
+                        break;
+                    }
+                }
 
                 spnSetor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override

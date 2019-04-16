@@ -235,6 +235,8 @@ public class PatrimonioFragment extends Fragment {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
                 Intent intent = new Intent(getActivity(), EditPatrimonioActivity.class);
                 intent.putExtra("patrimonio", patrimonio);
+                intent.putExtra("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
+                intent.putExtra("setor", patrimonio.getSetor().getBloco() + " - " + patrimonio.getSetor().getSala());
                 startActivity(intent);
             }
 
