@@ -1,17 +1,19 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
+import android.net.Uri;
+
 import java.io.Serializable;
 
 public class Imagem implements Serializable {
     private String nome;
-    private String urlImagem;
+    private Uri uri;
 
     public Imagem() {
     }
 
-    public Imagem(String nome, String urlImagem) {
+    public Imagem(String nome, Uri uri) {
         this.nome = nome;
-        this.urlImagem = urlImagem;
+        this.uri = uri;
     }
 
     public String getNome() {
@@ -22,11 +24,11 @@ public class Imagem implements Serializable {
         this.nome = nome;
     }
 
-    public String getUrlImagem() {
-        return urlImagem;
+    public Uri getUri() {
+        return uri;
     }
 
-    public void setUrlImagem(String urlImagem) {
-        this.urlImagem = urlImagem;
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 }

@@ -29,7 +29,7 @@ import br.com.lucasfrancisco.modulopatrimonio.activities.EditEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
-import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 
 public class EnderecoFragment extends Fragment {
@@ -138,7 +138,7 @@ public class EnderecoFragment extends Fragment {
 
 
     public void getRecyclerViewClickListener() {
-        enderecoAdapter.setRecyclerViewClickListener(new RecyclerViewClickListener() {
+        enderecoAdapter.setRCYDocumentSnapshotClickListener(new RCYDocumentSnapshotClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Endereco endereco = documentSnapshot.toObject(Endereco.class);

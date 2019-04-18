@@ -11,11 +11,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, PatrimonioAdapter.PatrimonioHolder> {
-    private RecyclerViewClickListener recyclerViewClickListener;
+    private RCYDocumentSnapshotClickListener RCYDocumentSnapshotClickListener;
 
     public PatrimonioAdapter(@NonNull FirestoreRecyclerOptions<Patrimonio> options) {
         super(options);
@@ -42,8 +42,8 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
         getSnapshots().getSnapshot(posicao).getReference().delete();
     }
 
-    public void setRecyclerViewClickListener(RecyclerViewClickListener recyclerViewClickListener) {
-        this.recyclerViewClickListener = recyclerViewClickListener;
+    public void setRCYDocumentSnapshotClickListener(RCYDocumentSnapshotClickListener RCYDocumentSnapshotClickListener) {
+        this.RCYDocumentSnapshotClickListener = RCYDocumentSnapshotClickListener;
     }
 
     class PatrimonioHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -65,8 +65,8 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
         public void onClick(View v) {
             int posicao = getAdapterPosition();
 
-            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
-                recyclerViewClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
+            if (posicao != RecyclerView.NO_POSITION && RCYDocumentSnapshotClickListener != null) {
+                RCYDocumentSnapshotClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
             }
         }
 
@@ -74,8 +74,8 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
         public boolean onLongClick(View v) {
             int posicao = getAdapterPosition();
 
-            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
-                recyclerViewClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
+            if (posicao != RecyclerView.NO_POSITION && RCYDocumentSnapshotClickListener != null) {
+                RCYDocumentSnapshotClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
             }
             return true;
         }

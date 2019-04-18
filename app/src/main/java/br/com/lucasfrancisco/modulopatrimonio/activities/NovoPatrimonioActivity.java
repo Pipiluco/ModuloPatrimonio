@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.NovaImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
@@ -60,9 +63,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private ArrayList<String> listEmpresas;
     //private ArrayList<String> listSetores;
     private ArrayList<String> listPatrimonios;
-    private List<String> listImagensEscolhidas;
+    private List<Imagem> imagems;
     private List<Boolean> listImagensEnviadas;
-    private List<Uri> listUriImagens;
     private int totalImagensList = 0;
 
 
@@ -90,20 +92,29 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         fabNovaImagem = (FloatingActionButton) findViewById(R.id.fabNovaImagem);
         tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
 
-        listImagensEscolhidas = new ArrayList<>();
+        imagems = new ArrayList<>();
         listImagensEnviadas = new ArrayList<>();
-        listUriImagens = new ArrayList<>();
-        imagemAdapter = new NovaImagemAdapter(listImagensEscolhidas, listImagensEnviadas, listUriImagens, getApplicationContext());
+        imagemAdapter = new NovaImagemAdapter(imagems, listImagensEnviadas, getApplicationContext());
 
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
         rcyImagens.setHasFixedSize(true);
         rcyImagens.setAdapter(imagemAdapter);
+        imagemAdapter.notifyDataSetChanged();
 
         getSpinnerEmpresas();
         getFabNovaEmpresa();
         getFabNovoSetor();
         getFabNovaImagem();
         getTbrBottomMain();
+        getItemTouch();
+
+        getClickRecyclerView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        imagemAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -117,11 +128,13 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 for (int i = 0; i < totalImagensSelecionadas; i++) {
                     Uri uri = data.getClipData().getItemAt(i).getUri();
                     String nomeArquivo = getNomeArquivo(uri);
+                    Imagem imagem = new Imagem(nomeArquivo, uri);
 
-                    listImagensEscolhidas.add(nomeArquivo);
+                    imagems.add(imagem);
                     listImagensEnviadas.add(false);
-                    listUriImagens.add(uri);
                     imagemAdapter.notifyDataSetChanged();
+
+                   // getClickRecyclerView();
 
                     StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
 
@@ -132,16 +145,17 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                             listImagensEnviadas.remove(finalI);
                             listImagensEnviadas.add(finalI, true);
                             imagemAdapter.notifyDataSetChanged();
+                            Log.d("RCY", "" + rcyImagens.getAdapter().getItemCount());
                         }
                     });
                 }
             } else if (data.getData() != null) {
                 Uri uri = data.getData();
                 String nomeArquivo = getNomeArquivo(uri);
+                Imagem imagem = new Imagem(nomeArquivo, uri);
 
-                listImagensEscolhidas.add(nomeArquivo);
+                imagems.add(imagem);
                 listImagensEnviadas.add(false);
-                listUriImagens.add(uri);
                 imagemAdapter.notifyDataSetChanged();
 
                 StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
@@ -198,10 +212,10 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
         Patrimonio patrimonio;
         //
-        ArrayList<Imagem> imagens = new ArrayList<>();
-        imagens.add(new Imagem("Gato", "www.gato.com.br"));
-        imagens.add(new Imagem("Boi", "www.boi.com.br"));
-        imagens.add(new Imagem("Cachorro", "www.cachorro.com.br"));
+        // ArrayList<Imagem> imagens = new ArrayList<>();
+        // imagens.add(new Imagem("Gato", "www.gato.com.br"));
+        // imagens.add(new Imagem("Boi", "www.boi.com.br"));
+        // imagens.add(new Imagem("Cachorro", "www.cachorro.com.br"));
         //
 
 
@@ -218,7 +232,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens);
+                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor); // imagens
                 collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                 Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                 getListPatrimonios();
@@ -345,6 +359,37 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Escolha imagem"), RESULT_LOAD_IMAGE);
+            }
+        });
+    }
+
+    // Remove imagem da lista
+    public void getItemTouch() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                imagemAdapter.excluir(viewHolder.getAdapterPosition());
+            }
+        }).attachToRecyclerView(rcyImagens);
+    }
+
+    // Click em item RecyclerView
+    public void getClickRecyclerView() {
+        imagemAdapter.setRcyViewClickListener(new RCYViewClickListener() {
+            @Override
+            public void onItemClick(View view, int posicao) {
+                Toast.makeText(getApplicationContext(), "Curto: " + posicao, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public boolean onItemLongClick(View view, int posicao) {
+                Toast.makeText(getApplicationContext(), "Longo: " + posicao, Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
     }

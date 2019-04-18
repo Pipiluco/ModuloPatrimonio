@@ -37,7 +37,7 @@ import br.com.lucasfrancisco.modulopatrimonio.activities.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
-import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 
 public class PatrimonioFragment extends Fragment {
@@ -229,7 +229,7 @@ public class PatrimonioFragment extends Fragment {
 
 
     public void getRecyclerViewClickListener() {
-        patrimonioAdapter.setRecyclerViewClickListener(new RecyclerViewClickListener() {
+        patrimonioAdapter.setRCYDocumentSnapshotClickListener(new RCYDocumentSnapshotClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);

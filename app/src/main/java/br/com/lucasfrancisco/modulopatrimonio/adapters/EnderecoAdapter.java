@@ -11,11 +11,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.interfaces.RecyclerViewClickListener;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 
 public class EnderecoAdapter extends FirestoreRecyclerAdapter<Endereco, EnderecoAdapter.EnderecoHolder> {
-    private RecyclerViewClickListener recyclerViewClickListener;
+    private RCYDocumentSnapshotClickListener rcyDocumentSnapshotClickListener;
 
     public EnderecoAdapter(@NonNull FirestoreRecyclerOptions<Endereco> options) {
         super(options);
@@ -38,8 +38,8 @@ public class EnderecoAdapter extends FirestoreRecyclerAdapter<Endereco, Endereco
         getSnapshots().getSnapshot(posicao).getReference().delete();
     }
 
-    public void setRecyclerViewClickListener(RecyclerViewClickListener recyclerViewClickListener) {
-        this.recyclerViewClickListener = recyclerViewClickListener;
+    public void setRCYDocumentSnapshotClickListener(RCYDocumentSnapshotClickListener RCYDocumentSnapshotClickListener) {
+        this.rcyDocumentSnapshotClickListener = RCYDocumentSnapshotClickListener;
     }
 
     // ViewHolder
@@ -61,8 +61,8 @@ public class EnderecoAdapter extends FirestoreRecyclerAdapter<Endereco, Endereco
         public void onClick(View v) {
             int posicao = getAdapterPosition();
 
-            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
-                recyclerViewClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
+            if (posicao != RecyclerView.NO_POSITION && rcyDocumentSnapshotClickListener != null) {
+                rcyDocumentSnapshotClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
             }
         }
 
@@ -70,8 +70,8 @@ public class EnderecoAdapter extends FirestoreRecyclerAdapter<Endereco, Endereco
         public boolean onLongClick(View v) {
             int posicao = getAdapterPosition();
 
-            if (posicao != RecyclerView.NO_POSITION && recyclerViewClickListener != null) {
-                recyclerViewClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
+            if (posicao != RecyclerView.NO_POSITION && rcyDocumentSnapshotClickListener != null) {
+                rcyDocumentSnapshotClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
             }
             return true;
         }
