@@ -1,6 +1,8 @@
 Feito
-    melhoramento no PesquisaFragment
+    Melhoramento no PesquisaFragment
+    Implementado a adição de imagens para o Firebase
 
 
 Fazer
-    Implementar a adição de imagens para o Firebase
+    Melhorar a adição de imagens para o Firebase
+    Implementar a adicação de objetos em (Fragments)

@@ -1,13 +1,18 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -20,25 +25,46 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.adapters.NovaImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
 public class NovoPatrimonioActivity extends AppCompatActivity {
+    private static final int RESULT_LOAD_IMAGE = 1;
+
     private Spinner spnEmpresa, spnSetor;
     private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
-    private FloatingActionButton fabNovaEmpresa, fabNovoSetor;
+    //private ProgressBar pbUpload;
+    //private ImageView imvImagem;
+    private RecyclerView rcyImagens;
+    private FloatingActionButton fabNovaEmpresa, fabNovoSetor, fabNovaImagem;
+    private Toolbar tbrBottomMain;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private StorageReference storageReference;
+    // private StorageTask uploadTask;
+
+    // private Uri uriImagem;
 
     private ArrayAdapter adapter;
+    private NovaImagemAdapter imagemAdapter;
     private ArrayList<String> listEmpresas;
     //private ArrayList<String> listSetores;
     private ArrayList<String> listPatrimonios;
+    private List<String> listImagensEscolhidas;
+    private List<Boolean> listImagensEnviadas;
+    private List<Uri> listUriImagens;
+    private int totalImagensList = 0;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,12 +82,81 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         edtTipo = (EditText) findViewById(R.id.edtTipo);
         edtMarca = (EditText) findViewById(R.id.edtMarca);
         edtModelo = (EditText) findViewById(R.id.edtModelo);
+        // pbUpload = (ProgressBar) findViewById(R.id.pbUpload);
+        // imvImagem = (ImageView) findViewById(R.id.imvImagem);
+        rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
         fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
         fabNovoSetor = (FloatingActionButton) findViewById(R.id.fabNovoSetor);
+        fabNovaImagem = (FloatingActionButton) findViewById(R.id.fabNovaImagem);
+        tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
+
+        listImagensEscolhidas = new ArrayList<>();
+        listImagensEnviadas = new ArrayList<>();
+        listUriImagens = new ArrayList<>();
+        imagemAdapter = new NovaImagemAdapter(listImagensEscolhidas, listImagensEnviadas, listUriImagens, getApplicationContext());
+
+        rcyImagens.setLayoutManager(new LinearLayoutManager(this));
+        rcyImagens.setHasFixedSize(true);
+        rcyImagens.setAdapter(imagemAdapter);
 
         getSpinnerEmpresas();
         getFabNovaEmpresa();
         getFabNovoSetor();
+        getFabNovaImagem();
+        getTbrBottomMain();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
+            if (data.getClipData() != null) {
+                int totalImagensSelecionadas = data.getClipData().getItemCount();
+                for (int i = 0; i < totalImagensSelecionadas; i++) {
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    String nomeArquivo = getNomeArquivo(uri);
+
+                    listImagensEscolhidas.add(nomeArquivo);
+                    listImagensEnviadas.add(false);
+                    listUriImagens.add(uri);
+                    imagemAdapter.notifyDataSetChanged();
+
+                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+
+                    final int finalI = i;
+                    uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            listImagensEnviadas.remove(finalI);
+                            listImagensEnviadas.add(finalI, true);
+                            imagemAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            } else if (data.getData() != null) {
+                Uri uri = data.getData();
+                String nomeArquivo = getNomeArquivo(uri);
+
+                listImagensEscolhidas.add(nomeArquivo);
+                listImagensEnviadas.add(false);
+                listUriImagens.add(uri);
+                imagemAdapter.notifyDataSetChanged();
+
+                StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+
+                uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        listImagensEnviadas.remove(totalImagensList);
+                        listImagensEnviadas.add(totalImagensList, true);
+                        imagemAdapter.notifyDataSetChanged();
+                        totalImagensList = totalImagensList + 1;
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -102,6 +197,13 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         Boolean isPatrimonio = false;
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
         Patrimonio patrimonio;
+        //
+        ArrayList<Imagem> imagens = new ArrayList<>();
+        imagens.add(new Imagem("Gato", "www.gato.com.br"));
+        imagens.add(new Imagem("Boi", "www.boi.com.br"));
+        imagens.add(new Imagem("Cachorro", "www.cachorro.com.br"));
+        //
+
 
         for (int i = 0; i < listPatrimonios.size(); i++) {
             // Log.d("PATRIMÔNIO", "" + listPatrimonios.get(i));
@@ -116,7 +218,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor);
+                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens);
                 collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                 Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                 getListPatrimonios();
@@ -129,19 +231,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 edtModelo.setText("");
             }
         }
-    }
-
-    public List<String> getItensSpinner(Spinner spinner) {
-        Adapter adapter = spinner.getAdapter();
-        int num = adapter.getCount();
-        List<String> list = new ArrayList<String>(num);
-
-        for (int i = 0; i < num; i++) {
-            String s = (String) adapter.getItem(i);
-            list.add(s);
-        }
-
-        return list;
     }
 
     public void getListPatrimonios() {
@@ -246,4 +335,139 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void getFabNovaImagem() {
+        fabNovaImagem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Escolha imagem"), RESULT_LOAD_IMAGE);
+            }
+        });
+    }
+
+    // Toolbar inferior
+    public void getTbrBottomMain() {
+        tbrBottomMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Intent intent = null;
+
+                switch (menuItem.getItemId()) {
+                    case R.id.itPatrimonio:
+                        intent = new Intent(getApplicationContext(), NovoPatrimonioActivity.class);
+                        break;
+                    case R.id.itEmpresa:
+                        intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                        break;
+                    case R.id.itEndereco:
+                        intent = new Intent(getApplicationContext(), NovoEnderecoActivity.class);
+                        break;
+                }
+                startActivity(intent);
+                return true;
+            }
+        });
+        tbrBottomMain.inflateMenu(R.menu.menu_toolbar_main);
+    }
+
+    // Retorna o nome de um arquivo selecionado no gerenciador de arquivos
+    public String getNomeArquivo(Uri uri) {
+        String resultado = null;
+
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    resultado = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        if (resultado == null) {
+            resultado = uri.getPath();
+            int corte = resultado.lastIndexOf('/');
+            if (corte != -1) {
+                resultado = resultado.substring(corte + 1);
+            }
+        }
+        return resultado;
+    }
 }
+
+// Upload de imagem
+/*
+@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            uriImagem = data.getData();
+            Picasso.with(this).load(uriImagem).into(imvImagem);
+        }
+    }
+
+    private void uploadImagem() {
+        final CollectionReference collectionReference = firebaseFirestore.collection("Uploads");
+        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+
+        if (uriImagem != null) {
+            final StorageReference arquivoReference = storageReference.child(System.currentTimeMillis() + "." + getExtensaoArquivo(uriImagem));
+
+            uploadTask = arquivoReference.putFile(uriImagem).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                private static final String TAG = "uploadDoArquivo";
+
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            pbUpload.setProgress(0);
+                        }
+                    }, 500);
+                    Toast.makeText(getApplicationContext(), "Upload completo!", Toast.LENGTH_SHORT).show();
+
+                    Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                    while (!uriTask.isSuccessful()) ;
+                    Uri downloadUri = uriTask.getResult();
+
+                    Log.d(TAG, ": Firebase URL: " + downloadUri.toString());
+                    // Upload upload = new Upload(edtNomeArquivo.getText().toString().trim(), downloadUri.toString());
+                    //
+                    String uploadId = collectionReference.document().getId();
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("url", downloadUri.toString());
+                    //
+
+                    collectionReference.document().set(map);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progresso = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    pbUpload.setProgress((int) progresso);
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Nenhum arquivo selecionado!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getExtensaoArquivo(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+ */
