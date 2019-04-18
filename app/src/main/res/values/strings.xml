@@ -62,6 +62,8 @@
     <string name="escolha_filtro">Escolha um filtro</string>
     <string name="escolha_setor">Escolha um setor</string>
 
+    <string name="imagem_ja_esta_na_lista">Imagem com mesmo nome na lista!</string>
+
     <string name="nao_ha_empresas_json">Não há empresas no arquivo Json!</string>
     <string name="navigation_drawer_open">Abre Naigation Drawer</string>
     <string name="navigation_drawer_close">Fecha Naigation Drawer</string>

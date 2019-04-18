@@ -32,7 +32,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.NovaImagemAdapter;
@@ -46,26 +46,18 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
     private Spinner spnEmpresa, spnSetor;
     private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
-    //private ProgressBar pbUpload;
-    //private ImageView imvImagem;
     private RecyclerView rcyImagens;
     private FloatingActionButton fabNovaEmpresa, fabNovoSetor, fabNovaImagem;
     private Toolbar tbrBottomMain;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private StorageReference storageReference;
-    // private StorageTask uploadTask;
-
-    // private Uri uriImagem;
 
     private ArrayAdapter adapter;
     private NovaImagemAdapter imagemAdapter;
     private ArrayList<String> listEmpresas;
-    //private ArrayList<String> listSetores;
     private ArrayList<String> listPatrimonios;
-    private List<Imagem> imagems;
-    private List<Boolean> listImagensEnviadas;
-    private int totalImagensList = 0;
+    private ArrayList<Imagem> imagens;
 
 
     @Override
@@ -75,7 +67,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         getListPatrimonios();
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_patrimonio));
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
@@ -84,17 +76,14 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         edtTipo = (EditText) findViewById(R.id.edtTipo);
         edtMarca = (EditText) findViewById(R.id.edtMarca);
         edtModelo = (EditText) findViewById(R.id.edtModelo);
-        // pbUpload = (ProgressBar) findViewById(R.id.pbUpload);
-        // imvImagem = (ImageView) findViewById(R.id.imvImagem);
         rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
         fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
         fabNovoSetor = (FloatingActionButton) findViewById(R.id.fabNovoSetor);
         fabNovaImagem = (FloatingActionButton) findViewById(R.id.fabNovaImagem);
         tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
 
-        imagems = new ArrayList<>();
-        listImagensEnviadas = new ArrayList<>();
-        imagemAdapter = new NovaImagemAdapter(imagems, listImagensEnviadas, getApplicationContext());
+        imagens = new ArrayList<>();
+        imagemAdapter = new NovaImagemAdapter(imagens, getApplicationContext());
 
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
         rcyImagens.setHasFixedSize(true);
@@ -107,7 +96,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         getFabNovaImagem();
         getTbrBottomMain();
         getItemTouch();
-
         getClickRecyclerView();
     }
 
@@ -128,47 +116,61 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 for (int i = 0; i < totalImagensSelecionadas; i++) {
                     Uri uri = data.getClipData().getItemAt(i).getUri();
                     String nomeArquivo = getNomeArquivo(uri);
-                    Imagem imagem = new Imagem(nomeArquivo, uri);
+                    Imagem imagem = new Imagem(nomeArquivo, uri, false);
+                    boolean isNaLista = false;
+                    // Verifica se já contém imagem com mesmo nome no RecyclerView
+                    for (int j = 0; j < imagens.size(); j++) {
+                        if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                            isNaLista = true;
+                            Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                            break;
+                        }
+                    }
+                    // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+                    if (!isNaLista) {
+                        imagens.add(imagem);
+                    }
 
-                    imagems.add(imagem);
-                    listImagensEnviadas.add(false);
                     imagemAdapter.notifyDataSetChanged();
 
-                   // getClickRecyclerView();
-
-                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
-
-                    final int finalI = i;
+                   /* StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+                    final int finalImagens = imagens.size();
                     uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            listImagensEnviadas.remove(finalI);
-                            listImagensEnviadas.add(finalI, true);
+                            imagens.get(finalImagens - 1).setEnviada(true);
                             imagemAdapter.notifyDataSetChanged();
-                            Log.d("RCY", "" + rcyImagens.getAdapter().getItemCount());
                         }
-                    });
+                    }); */
                 }
             } else if (data.getData() != null) {
                 Uri uri = data.getData();
                 String nomeArquivo = getNomeArquivo(uri);
-                Imagem imagem = new Imagem(nomeArquivo, uri);
+                Imagem imagem = new Imagem(nomeArquivo, uri, false);
+                boolean isNaLista = false;
+                // Verifica se já contém imagem com mesmo nome no RecyclerView
+                for (int j = 0; j < imagens.size(); j++) {
+                    if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                        isNaLista = true;
+                        Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                }
+                // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+                if (!isNaLista) {
+                    imagens.add(imagem);
+                }
 
-                imagems.add(imagem);
-                listImagensEnviadas.add(false);
                 imagemAdapter.notifyDataSetChanged();
 
-                StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
-
+              /*  StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
                 uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        listImagensEnviadas.remove(totalImagensList);
-                        listImagensEnviadas.add(totalImagensList, true);
+                        imagens.get(imagens.size() - 1).setEnviada(true);
                         imagemAdapter.notifyDataSetChanged();
-                        totalImagensList = totalImagensList + 1;
                     }
-                });
+                }); */
             }
         }
     }
@@ -185,6 +187,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.itSalvar:
                 salvar();
+                Log.d("IMG", "" + imagens.size());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -203,14 +206,14 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
 
         Setor setor = (Setor) spnSetor.getSelectedItem();
-        String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
-        String plaqueta = edtPlaqueta.getText().toString();
+        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
+        final String plaqueta = edtPlaqueta.getText().toString();
         String tipo = edtTipo.getText().toString();
         String marca = edtMarca.getText().toString();
         String modelo = edtModelo.getText().toString();
         Boolean isPatrimonio = false;
-        CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-        Patrimonio patrimonio;
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+        final Patrimonio patrimonio;
         //
         // ArrayList<Imagem> imagens = new ArrayList<>();
         // imagens.add(new Imagem("Gato", "www.gato.com.br"));
@@ -232,11 +235,31 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor); // imagens
-                collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
-                getListPatrimonios();
-                isPatrimonio = true;
+                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
+
+                if (imagens.size() > 0) {
+                    for (int i = 0; i < imagens.size(); i++) {
+                        StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(plaqueta + "_" + imagens.get(i).getNome());
+                        final int finalI = i;
+                        uploadReference.putFile(imagens.get(i).getUri()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                imagens.get(finalI).setEnviada(true);
+                                imagemAdapter.notifyDataSetChanged();
+
+                                if (finalI == imagens.size() - 1) {
+                                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                                    getListPatrimonios();
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                    getListPatrimonios();
+                }
 
                 // Limpa campos de texto
                 edtPlaqueta.setText("");
@@ -445,74 +468,74 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     }
 }
 
-// Upload de imagem
 /*
 @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        storageReference = FirebaseStorage.getInstance().getReference();
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            uriImagem = data.getData();
-            Picasso.with(this).load(uriImagem).into(imvImagem);
-        }
-    }
-
-    private void uploadImagem() {
-        final CollectionReference collectionReference = firebaseFirestore.collection("Uploads");
-        storageReference = FirebaseStorage.getInstance().getReference("uploads");
-
-        if (uriImagem != null) {
-            final StorageReference arquivoReference = storageReference.child(System.currentTimeMillis() + "." + getExtensaoArquivo(uriImagem));
-
-            uploadTask = arquivoReference.putFile(uriImagem).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                private static final String TAG = "uploadDoArquivo";
-
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            pbUpload.setProgress(0);
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
+            if (data.getClipData() != null) {
+                int totalImagensSelecionadas = data.getClipData().getItemCount();
+                for (int i = 0; i < totalImagensSelecionadas; i++) {
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    String nomeArquivo = getNomeArquivo(uri);
+                    Imagem imagem = new Imagem(nomeArquivo, uri, false);
+                    boolean isNaLista = false;
+                    // Verifica se já contém imagem com mesmo nome no RecyclerView
+                    for (int j = 0; j < imagens.size(); j++) {
+                        if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                            isNaLista = true;
+                            Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                            break;
                         }
-                    }, 500);
-                    Toast.makeText(getApplicationContext(), "Upload completo!", Toast.LENGTH_SHORT).show();
+                    }
+                    // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+                    if (!isNaLista) {
+                        imagens.add(imagem);
+                    }
 
-                    Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                    while (!uriTask.isSuccessful()) ;
-                    Uri downloadUri = uriTask.getResult();
+                    imagemAdapter.notifyDataSetChanged();
 
-                    Log.d(TAG, ": Firebase URL: " + downloadUri.toString());
-                    // Upload upload = new Upload(edtNomeArquivo.getText().toString().trim(), downloadUri.toString());
-                    //
-                    String uploadId = collectionReference.document().getId();
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("url", downloadUri.toString());
-                    //
-
-                    collectionReference.document().set(map);
+                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+                    final int finalImagens = imagens.size();
+                    uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            imagens.get(finalImagens - 1).setEnviada(true);
+                            imagemAdapter.notifyDataSetChanged();
+                        }
+                    });
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            } else if (data.getData() != null) {
+                Uri uri = data.getData();
+                String nomeArquivo = getNomeArquivo(uri);
+                Imagem imagem = new Imagem(nomeArquivo, uri, false);
+                boolean isNaLista = false;
+                // Verifica se já contém imagem com mesmo nome no RecyclerView
+                for (int j = 0; j < imagens.size(); j++) {
+                    if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                        isNaLista = true;
+                        Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                        break;
+                    }
                 }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    double progresso = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    pbUpload.setProgress((int) progresso);
+                // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+                if (!isNaLista) {
+                    imagens.add(imagem);
                 }
-            });
-        } else {
-            Toast.makeText(getApplicationContext(), "Nenhum arquivo selecionado!", Toast.LENGTH_SHORT).show();
+
+                imagemAdapter.notifyDataSetChanged();
+
+                StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+                uploadReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        imagens.get(imagens.size() - 1).setEnviada(true);
+                        imagemAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
         }
-    }
-
-    private String getExtensaoArquivo(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
  */
