@@ -38,7 +38,7 @@ public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.Vi
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Imagem imagem = imagems.get(position);
         viewHolder.tvNomeImagem.setText(imagem.getNome());
-        Picasso.with(context).load(imagem.getUri()).into(viewHolder.imvImagem);
+        Picasso.with(context).load(imagem.getUrlLocal()).into(viewHolder.imvImagem);
 
         if (!imagem.isEnviada()) {
             viewHolder.imvProgresso.setImageResource(R.drawable.ic_loading_01);

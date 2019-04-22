@@ -1,20 +1,20 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 
 public class Imagem implements Serializable {
     private String nome;
-    private Uri uri;
+    private String urlLocal;
+    private String urlRemota;
     private boolean isEnviada;
 
     public Imagem() {
     }
 
-    public Imagem(String nome, Uri uri, boolean isEnviada) {
+    public Imagem(String nome, String urlLocal, String urlRemota, boolean isEnviada) {
         this.nome = nome;
-        this.uri = uri;
+        this.urlLocal = urlLocal;
+        this.urlRemota = urlRemota;
         this.isEnviada = isEnviada;
     }
 
@@ -26,12 +26,20 @@ public class Imagem implements Serializable {
         this.nome = nome;
     }
 
-    public Uri getUri() {
-        return uri;
+    public String getUrlLocal() {
+        return urlLocal;
     }
 
-    public void setUri(Uri uri) {
-        this.uri = uri;
+    public void setUrlLocal(String urlLocal) {
+        this.urlLocal = urlLocal;
+    }
+
+    public String getUrlRemota() {
+        return urlRemota;
+    }
+
+    public void setUrlRemota(String urlRemota) {
+        this.urlRemota = urlRemota;
     }
 
     public boolean isEnviada() {
