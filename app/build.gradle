@@ -76,4 +76,8 @@ dependencies {
     // Ultilizada para imagens
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+    // Ultilizadas para scanner qr code e bar code
+    implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
+    implementation 'com.google.zxing:core:3.2.1'
+
 }

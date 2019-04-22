@@ -21,6 +21,7 @@
     <string name="plaqueta">Plaqueta</string>
     <string name="rua">Rua</string>
     <string name="sala">Sala</string>
+    <string name="salvando">Salvando</string>
     <string name="setor">Setor</string>
     <string name="setores">Setores</string>
     <string name="nome">Nome</string>
@@ -47,6 +48,7 @@
     <string name="pesquisar">Pesquisar</string>
 
     <!-- Frases -->
+    <string name="aponte_a_camera_para_codigo">Aponte a câmera para um QR code ou código de barras!</string>
     <string name="dados_incompletos">Dados incompletos!</string>
 
     <string name="empresa_ja_existe">Já existe empresa salva com este código!</string>
@@ -79,6 +81,7 @@
     <string name="patrimonio_ja_existe">Já existe patrimônio salvo com esta plaqueta!</string>
     <string name="patrimonio_nao_encontrado">Patrimônio não encontrado!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
+    <string name="por_favor_aguarde">Por favor, aguarde!</string>
 
     <string name="sem_resultado">Sem resultado!</string>
     <string name="setor_ja_existe">Já existe setor salvo com estas informações!</string>
