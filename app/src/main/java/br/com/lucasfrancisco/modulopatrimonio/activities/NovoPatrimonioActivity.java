@@ -193,7 +193,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    //
     public void salvar() { // Estável OK
         if (spnEmpresa.getSelectedItem() == null) {
             Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
@@ -220,8 +220,82 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         // imagens.add(new Imagem("Boi", "www.boi.com.br"));
         // imagens.add(new Imagem("Cachorro", "www.cachorro.com.br"));
         //
+        for (int i = 0; i < listPatrimonios.size(); i++) {
+            // Log.d("PATRIMÔNIO", "" + listPatrimonios.get(i));
+            if (plaqueta.equals(listPatrimonios.get(i))) {
+                isPatrimonio = true;
+                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
+            }
+        }
 
+        if (!isPatrimonio) {
+            // Log.d("NÃO EXISTE", plaqueta);
+            if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
+                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+            } else {
+                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
 
+                if (imagens.size() > 0) { // Salva patrimônio com imagem
+                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+
+                    for (int i = 0; i < imagens.size(); i++) {
+                        StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(plaqueta + "_" + imagens.get(i).getNome());
+                        final int finalI = i;
+                        uploadReference.putFile(imagens.get(i).getUri()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                imagens.get(finalI).setEnviada(true);
+                                imagemAdapter.notifyDataSetChanged();
+
+                                if (finalI == imagens.size() - 100) {
+                                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                                    getListPatrimonios();
+                                }
+                            }
+                        });
+                    }
+                } else { // Salva patrimônio sem imagem
+                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                    getListPatrimonios();
+                }
+
+                // Limpa campos de texto
+                edtPlaqueta.setText("");
+                edtTipo.setText("");
+                edtMarca.setText("");
+                edtModelo.setText("");
+            }
+        }
+    }
+    //
+    public void salvar2() { // Estável OK
+        if (spnEmpresa.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (spnSetor.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Setor setor = (Setor) spnSetor.getSelectedItem();
+        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
+        final String plaqueta = edtPlaqueta.getText().toString();
+        String tipo = edtTipo.getText().toString();
+        String marca = edtMarca.getText().toString();
+        String modelo = edtModelo.getText().toString();
+        Boolean isPatrimonio = false;
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+        final Patrimonio patrimonio;
+        //
+        // ArrayList<Imagem> imagens = new ArrayList<>();
+        // imagens.add(new Imagem("Gato", "www.gato.com.br"));
+        // imagens.add(new Imagem("Boi", "www.boi.com.br"));
+        // imagens.add(new Imagem("Cachorro", "www.cachorro.com.br"));
+        //
         for (int i = 0; i < listPatrimonios.size(); i++) {
             // Log.d("PATRIMÔNIO", "" + listPatrimonios.get(i));
             if (plaqueta.equals(listPatrimonios.get(i))) {
