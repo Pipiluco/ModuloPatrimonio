@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
@@ -38,11 +37,10 @@ public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.Vi
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Imagem imagem = imagems.get(position);
         viewHolder.tvNomeImagem.setText(imagem.getNome());
-        Picasso.with(context).load(imagem.getUrlLocal()).into(viewHolder.imvImagem);
 
-        if (!imagem.isEnviada()) {
-            viewHolder.imvProgresso.setImageResource(R.drawable.ic_loading_01);
-        } else {
+        Picasso.with(context).load(imagem.getUrlLocal()).placeholder(R.drawable.ic_image).into(viewHolder.imvImagem);
+
+        if (imagem.isEnviada()) {
             viewHolder.imvProgresso.setImageResource(R.drawable.ic_checked_01);
         }
     }

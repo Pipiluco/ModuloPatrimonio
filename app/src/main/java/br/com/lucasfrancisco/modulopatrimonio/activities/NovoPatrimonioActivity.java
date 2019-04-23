@@ -103,6 +103,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
         rcyImagens.setHasFixedSize(true);
+        rcyImagens.setItemViewCacheSize(20);
         rcyImagens.setAdapter(imagemAdapter);
         imagemAdapter.notifyDataSetChanged();
 
@@ -129,7 +130,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         IntentResult result = IntentIntegrator.parseActivityResult(IntentIntegrator.REQUEST_CODE, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) { // Verifica o requestCode, para abrir o Intent adequado
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) { // Verifica o requestCode, para abrir a galeria
             if (data.getClipData() != null) { // Escolha multipla de arquivos
                 int totalImagensSelecionadas = data.getClipData().getItemCount();
                 for (int i = 0; i < totalImagensSelecionadas; i++) {
@@ -170,7 +171,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 }
                 imagemAdapter.notifyDataSetChanged();
             }
-        } else if (requestCode == RESULT_SCAN_CODE && resultCode == RESULT_OK) { // Verifica o requestCode, para abrir o Intent adequado
+        } else if (requestCode == RESULT_SCAN_CODE && resultCode == RESULT_OK) { // Verifica o requestCode, para acionar o Scanner
             String resultado = result.getContents();
 
             edtPlaqueta.setText(removePrimeiroZero(resultado));
@@ -521,54 +522,3 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         return plaqueta;
     }
 }
-
-/*
-@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        storageReference = FirebaseStorage.getInstance().getReference();
-
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
-            if (data.getClipData() != null) { // Escolha multipla de arquivos
-                int totalImagensSelecionadas = data.getClipData().getItemCount();
-                for (int i = 0; i < totalImagensSelecionadas; i++) {
-                    Uri uri = data.getClipData().getItemAt(i).getUri();
-                    String nomeArquivo = getNomeArquivo(uri);
-                    Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
-                    boolean isNaLista = false;
-                    // Verifica se já contém imagem com mesmo nome no RecyclerView
-                    for (int j = 0; j < imagens.size(); j++) {
-                        if (imagens.get(j).getNome().equals(nomeArquivo)) {
-                            isNaLista = true;
-                            Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
-                            break;
-                        }
-                    }
-                    // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
-                    if (!isNaLista) {
-                        imagens.add(imagem);
-                    }
-                    imagemAdapter.notifyDataSetChanged();
-                }
-            } else if (data.getData() != null) { // Escolha simples de arquivos
-                Uri uri = data.getData();
-                String nomeArquivo = getNomeArquivo(uri);
-                Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
-                boolean isNaLista = false;
-                // Verifica se já contém imagem com mesmo nome no RecyclerView
-                for (int j = 0; j < imagens.size(); j++) {
-                    if (imagens.get(j).getNome().equals(nomeArquivo)) {
-                        isNaLista = true;
-                        Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
-                        break;
-                    }
-                }
-                // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
-                if (!isNaLista) {
-                    imagens.add(imagem);
-                }
-                imagemAdapter.notifyDataSetChanged();
-            }
-        }
-    }
- */
