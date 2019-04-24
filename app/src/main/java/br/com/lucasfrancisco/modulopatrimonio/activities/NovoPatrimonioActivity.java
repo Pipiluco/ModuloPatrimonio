@@ -1,12 +1,16 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -34,13 +38,13 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
@@ -51,14 +55,15 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
 public class NovoPatrimonioActivity extends AppCompatActivity {
-    private static final int RESULT_LOAD_IMAGE = 1;
-    private static final int RESULT_SCAN_CODE = 101;
+    private static final int REQUEST_LOAD_IMAGE = 1;
+    private static final int REQUEST_SCAN_CODE = 101;
+    private static final int REQUEST_CAMERA_CODE = 3;
 
     private Spinner spnEmpresa, spnSetor;
     private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
     private ImageButton imbScanner;
     private RecyclerView rcyImagens;
-    private FloatingActionButton fabNovaEmpresa, fabNovoSetor, fabNovaImagem;
+    private FloatingActionButton fabNovaFoto, fabGaleria;
     private Toolbar tbrBottomMain;
     private ProgressDialog progressDialog;
 
@@ -69,9 +74,10 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private NovaImagemAdapter imagemAdapter;
     private ArrayList<String> listEmpresas;
     private ArrayList<String> listPatrimonios;
-    private ArrayList<Imagem> imagens;
+    private List<Imagem> imagens;
 
     private Activity activity = this;
+    private Uri uriImagemCamera;
 
 
     @Override
@@ -92,9 +98,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         edtModelo = (EditText) findViewById(R.id.edtModelo);
         imbScanner = (ImageButton) findViewById(R.id.imbScanner);
         rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
-        fabNovaEmpresa = (FloatingActionButton) findViewById(R.id.fabNovaEmpresa);
-        fabNovoSetor = (FloatingActionButton) findViewById(R.id.fabNovoSetor);
-        fabNovaImagem = (FloatingActionButton) findViewById(R.id.fabNovaImagem);
+        fabNovaFoto = (FloatingActionButton) findViewById(R.id.fabNovaFoto);
+        fabGaleria = (FloatingActionButton) findViewById(R.id.fabGaleria);
         tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
 
         progressDialog = new ProgressDialog(this);
@@ -107,9 +112,9 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         rcyImagens.setAdapter(imagemAdapter);
         imagemAdapter.notifyDataSetChanged();
 
+        getPermissoes();
         getSpinnerEmpresas();
-        getFabNovaEmpresa();
-        getFabNovoSetor();
+        getFabNovaFoto();
         getFabNovaImagem();
         getTbrBottomMain();
         getItemTouch();
@@ -126,55 +131,19 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        storageReference = FirebaseStorage.getInstance().getReference();
 
-        IntentResult result = IntentIntegrator.parseActivityResult(IntentIntegrator.REQUEST_CODE, resultCode, data);
-
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) { // Verifica o requestCode, para abrir a galeria
-            if (data.getClipData() != null) { // Escolha multipla de arquivos
-                int totalImagensSelecionadas = data.getClipData().getItemCount();
-                for (int i = 0; i < totalImagensSelecionadas; i++) {
-                    Uri uri = data.getClipData().getItemAt(i).getUri();
-                    String nomeArquivo = getNomeArquivo(uri);
-                    Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
-                    boolean isNaLista = false;
-                    // Verifica se já contém imagem com mesmo nome no RecyclerView
-                    for (int j = 0; j < imagens.size(); j++) {
-                        if (imagens.get(j).getNome().equals(nomeArquivo)) {
-                            isNaLista = true;
-                            Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
-                            break;
-                        }
-                    }
-                    // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
-                    if (!isNaLista) {
-                        imagens.add(imagem);
-                    }
-                    imagemAdapter.notifyDataSetChanged();
-                }
-            } else if (data.getData() != null) { // Escolha simples de arquivos
-                Uri uri = data.getData();
-                String nomeArquivo = getNomeArquivo(uri);
-                Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
-                boolean isNaLista = false;
-                // Verifica se já contém imagem com mesmo nome no RecyclerView
-                for (int j = 0; j < imagens.size(); j++) {
-                    if (imagens.get(j).getNome().equals(nomeArquivo)) {
-                        isNaLista = true;
-                        Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
-                        break;
-                    }
-                }
-                // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
-                if (!isNaLista) {
-                    imagens.add(imagem);
-                }
-                imagemAdapter.notifyDataSetChanged();
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_LOAD_IMAGE: // Abre a galeria
+                    requestLoadImage(data);
+                    break;
+                case REQUEST_SCAN_CODE: // Abre o scanner
+                    requestScanCode(resultCode, data);
+                    break;
+                case REQUEST_CAMERA_CODE: // Abre a cãmera
+                    requestCameraCode();
+                    break;
             }
-        } else if (requestCode == RESULT_SCAN_CODE && resultCode == RESULT_OK) { // Verifica o requestCode, para acionar o Scanner
-            String resultado = result.getContents();
-
-            edtPlaqueta.setText(removePrimeiroZero(resultado));
         }
     }
 
@@ -281,6 +250,62 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
     }
 
+    private void requestLoadImage(Intent data) {
+        if (data.getClipData() != null) { // Escolha multipla de arquivos
+            int totalImagensSelecionadas = data.getClipData().getItemCount();
+            for (int i = 0; i < totalImagensSelecionadas; i++) {
+                Uri uri = data.getClipData().getItemAt(i).getUri();
+                String nomeArquivo = getNomeArquivo(uri);
+                Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
+                boolean isNaLista = false;
+                // Verifica se já contém imagem com mesmo nome no RecyclerView
+                for (int j = 0; j < imagens.size(); j++) {
+                    if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                        isNaLista = true;
+                        Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                }
+                // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+                if (!isNaLista) {
+                    imagens.add(imagem);
+                }
+                imagemAdapter.notifyDataSetChanged();
+            }
+        } else if (data.getData() != null) { // Escolha simples de arquivos
+            Uri uri = data.getData();
+            String nomeArquivo = getNomeArquivo(uri);
+            Imagem imagem = new Imagem(nomeArquivo, uri.toString(), null, false);
+            boolean isNaLista = false;
+            // Verifica se já contém imagem com mesmo nome no RecyclerView
+            for (int j = 0; j < imagens.size(); j++) {
+                if (imagens.get(j).getNome().equals(nomeArquivo)) {
+                    isNaLista = true;
+                    Toast.makeText(getApplicationContext(), getString(R.string.imagem_ja_esta_na_lista), Toast.LENGTH_LONG).show();
+                    break;
+                }
+            }
+            // Se não hover imagem com o mesmo nome no RecyclerView, será adicionado a nova imagem
+            if (!isNaLista) {
+                imagens.add(imagem);
+            }
+            imagemAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void requestScanCode(int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(IntentIntegrator.REQUEST_CODE, resultCode, data);
+        String resultado = result.getContents();
+        edtPlaqueta.setText(removePrimeiroZero(resultado));
+    }
+
+    private void requestCameraCode() {
+        String nomeArquivo = getNomeArquivo(uriImagemCamera);
+        Imagem imagem = new Imagem(nomeArquivo, uriImagemCamera.toString(), null, false);
+        imagens.add(imagem);
+        imagemAdapter.notifyDataSetChanged();
+    }
+
     private String getExtensaoArquivo(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -370,35 +395,33 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
-    public void getFabNovaEmpresa() {
-        fabNovaEmpresa.setOnClickListener(new View.OnClickListener() {
+    public void getFabNovaFoto() {
+        fabNovaFoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Nova imagem");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "Sua câmera");
 
-    public void getFabNovoSetor() {
-        fabNovoSetor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NovoSetorActivity.class);
-                startActivity(intent);
+                uriImagemCamera = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagemCamera);
+
+                startActivityForResult(intent, REQUEST_CAMERA_CODE);
             }
         });
     }
 
     public void getFabNovaImagem() {
-        fabNovaImagem.setOnClickListener(new View.OnClickListener() {
+        fabGaleria.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Escolha imagem"), RESULT_LOAD_IMAGE);
+                startActivityForResult(Intent.createChooser(intent, "Escolha imagem"), REQUEST_LOAD_IMAGE);
             }
         });
     }
@@ -415,7 +438,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 integrator.setBarcodeImageEnabled(false);
 
                 Intent intent = integrator.createScanIntent();
-                startActivityForResult(intent, RESULT_SCAN_CODE);
+                startActivityForResult(intent, REQUEST_SCAN_CODE);
             }
         });
     }
@@ -513,12 +536,16 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
     public String removePrimeiroZero(String plaqueta) {
         if (!plaqueta.isEmpty()) {
-            String texto = plaqueta.substring(0, 1);
             if (plaqueta.substring(0, 1).equals("0")) {
                 plaqueta = plaqueta.substring(1);
             }
-            System.out.println("Plaqueta: " + plaqueta);
         }
         return plaqueta;
+    }
+
+    public void getPermissoes() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+        }
     }
 }

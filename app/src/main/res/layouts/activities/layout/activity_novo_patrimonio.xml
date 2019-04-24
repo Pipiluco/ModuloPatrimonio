@@ -103,27 +103,19 @@
         app:menu_showShadow="true">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabNovaImagem"
+            android:id="@+id/fabGaleria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery_01"
+            app:fab_label="@string/galeria"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovaFoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_photo"
-            app:fab_label="@string/imagem"
-            app:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabNovaEmpresa"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_empresa_01"
-            app:fab_label="@string/empresa"
-            app:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabNovoSetor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_setor_01"
-            app:fab_label="@string/setor"
+            app:fab_label="@string/camera"
             app:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 

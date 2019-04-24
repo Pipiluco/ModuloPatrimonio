@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
@@ -19,10 +19,10 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.ViewHolder> {
     private RCYViewClickListener rcyViewClickListener;
 
-    private ArrayList<Imagem> imagems;
+    private List<Imagem> imagems;
     private Context context;
 
-    public NovaImagemAdapter(ArrayList<Imagem> imagems, Context context) {
+    public NovaImagemAdapter(List<Imagem> imagems, Context context) {
         this.imagems = imagems;
         this.context = context;
     }
@@ -38,7 +38,7 @@ public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.Vi
         Imagem imagem = imagems.get(position);
         viewHolder.tvNomeImagem.setText(imagem.getNome());
 
-        Picasso.with(context).load(imagem.getUrlLocal()).placeholder(R.drawable.ic_image).into(viewHolder.imvImagem);
+        Picasso.with(context).load(imagem.getUrlLocal()).placeholder(R.drawable.ic_image).fit().centerCrop().into(viewHolder.imvImagem);
 
         if (imagem.isEnviada()) {
             viewHolder.imvProgresso.setImageResource(R.drawable.ic_checked_01);

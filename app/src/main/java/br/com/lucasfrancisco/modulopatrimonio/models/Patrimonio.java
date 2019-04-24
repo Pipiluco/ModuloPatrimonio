@@ -1,13 +1,13 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Patrimonio extends Objeto implements Serializable {
     private String plaqueta;
     private boolean isAtivo;
     private Setor setor;
-    private ArrayList<Imagem> imagens;
+    private List<Imagem> imagens;
 
     public Patrimonio() {
     }
@@ -20,7 +20,7 @@ public class Patrimonio extends Objeto implements Serializable {
         this.setor = setor;
     }
 
-    public Patrimonio(String tipo, String marca, String modelo, String plaqueta, boolean isAtivo, Setor setor, ArrayList<Imagem> imagens) {
+    public Patrimonio(String tipo, String marca, String modelo, String plaqueta, boolean isAtivo, Setor setor, List<Imagem> imagens) {
         super(tipo, marca, modelo);
         this.plaqueta = plaqueta;
         this.isAtivo = isAtivo;
@@ -52,11 +52,11 @@ public class Patrimonio extends Objeto implements Serializable {
         this.setor = setor;
     }
 
-    public ArrayList<Imagem> getImagens() {
+    public List<Imagem> getImagens() {
         return imagens;
     }
 
-    public void setImagens(ArrayList<Imagem> imagens) {
+    public void setImagens(List<Imagem> imagens) {
         this.imagens = imagens;
     }
 }

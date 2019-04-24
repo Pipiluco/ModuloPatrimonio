@@ -1,8 +1,11 @@
 Feito
     Melhoramento no PesquisaFragment
     Implementado a adição de imagens para o Firebase
+    Implementado o scanner
+    Implementado a adicação de imagem através da câmera
+    Melhorado a adição de imagens para o Firebase
+    Melhorado a performace do RecyclerView NovoPatrimonioActivity com a biblioteca Picasso
 
 
 Fazer
-    Melhorar a adição de imagens para o Firebase
     Implementar a adicação de objetos em (Fragments)

@@ -6,6 +6,7 @@
     <string name="marca">Marca</string>
     <string name="bairro">Bairro</string>
     <string name="bloco">Bloco</string>
+    <string name="camera">Câmera</string>
     <string name="cep">CEP</string>
     <string name="cidade">Cidade</string>
     <string name="cor">Cor</string>
@@ -13,6 +14,7 @@
     <string name="estado">Estado</string>
     <string name="excluir">Excluir</string>
     <string name="imagem">Imagem</string>
+    <string name="galeria">Galeria</string>
     <string name="limite">Limite</string>
     <string name="modelo">Modelo</string>
     <string name="numero">Número</string>
