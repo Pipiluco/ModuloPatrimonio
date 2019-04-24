@@ -140,7 +140,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 case REQUEST_SCAN_CODE: // Abre o scanner
                     requestScanCode(resultCode, data);
                     break;
-                case REQUEST_CAMERA_CODE: // Abre a cãmera
+                case REQUEST_CAMERA_CODE: // Abre a câmera
                     requestCameraCode();
                     break;
             }
