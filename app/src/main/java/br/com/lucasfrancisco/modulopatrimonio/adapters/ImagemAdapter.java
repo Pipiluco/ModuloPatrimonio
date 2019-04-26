@@ -16,13 +16,13 @@ import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 
-public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.ViewHolder> {
+public class ImagemAdapter extends RecyclerView.Adapter<ImagemAdapter.ViewHolder> {
     private RCYViewClickListener rcyViewClickListener;
 
     private List<Imagem> imagems;
     private Context context;
 
-    public NovaImagemAdapter(List<Imagem> imagems, Context context) {
+    public ImagemAdapter(List<Imagem> imagems, Context context) {
         this.imagems = imagems;
         this.context = context;
     }
@@ -96,13 +96,13 @@ public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.Vi
 
 
 /*
-public class NovaImagemAdapter extends RecyclerView.Adapter<NovaImagemAdapter.ViewHolder> {
+public class ImagemAdapter extends RecyclerView.Adapter<ImagemAdapter.ViewHolder> {
     private List<Imagem> imagems;
     private List<Boolean> listImagensEnviadas;
     private List<Uri> listUriImagens;
     private Context context;
 
-    public NovaImagemAdapter(List<Imagem> imagems, List<Boolean> listImagensEnviadas, List<Uri> listUriImagens, Context context) {
+    public ImagemAdapter(List<Imagem> imagems, List<Boolean> listImagensEnviadas, List<Uri> listUriImagens, Context context) {
         this.imagems = imagems;
         this.listImagensEnviadas = listImagensEnviadas;
         this.listUriImagens = listUriImagens;

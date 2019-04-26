@@ -10,3 +10,6 @@ Feito
 Fazer
     Implementar a adicação de objetos em (Fragments)
     Implementar exclusão de patriônio e suas imagens
+    Implementar salvar patrimônio em segundo plano
+    Implementar notificação para salvar e atualizar patrimônio
+

@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             patrimonioFragment.pesquisar(texto, filtro, limite);
         } else if (fragment instanceof EmpresaFragment) {
             EmpresaFragment empresaFragment = (EmpresaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
-            empresaFragment.getTextPesquisa(texto, filtro);
+            empresaFragment.pesquisar(texto, filtro, limite);
         } else if (fragment instanceof EnderecoFragment) {
             EnderecoFragment enderecoFragment = (EnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             enderecoFragment.pesquisar(texto, filtro, limite);

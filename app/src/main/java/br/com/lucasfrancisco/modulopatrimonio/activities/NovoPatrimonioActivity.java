@@ -38,6 +38,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -48,7 +49,7 @@ import java.util.List;
 import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.adapters.NovaImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.adapters.ImagemAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
@@ -71,7 +72,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private ArrayAdapter adapter;
-    private NovaImagemAdapter imagemAdapter;
+    private ImagemAdapter imagemAdapter;
     private ArrayList<String> listEmpresas;
     private ArrayList<String> listPatrimonios;
     private List<Imagem> imagens;
@@ -104,7 +105,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
         imagens = new ArrayList<>();
-        imagemAdapter = new NovaImagemAdapter(imagens, getApplicationContext());
+        imagemAdapter = new ImagemAdapter(imagens, getApplicationContext());
 
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
         rcyImagens.setHasFixedSize(true);
@@ -115,7 +116,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         getPermissoes();
         getSpinnerEmpresas();
         getFabNovaFoto();
-        getFabNovaImagem();
+        getFabGaleria();
         getTbrBottomMain();
         getItemTouch();
         getClickRecyclerView();
@@ -167,6 +168,9 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
     // Salva patrimônio
     public void salvar() { // Estável OK
+        storageReference = FirebaseStorage.getInstance().getReference();
+        getListPatrimonios();
+
         if (spnEmpresa.getSelectedItem() == null) {
             Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
             return;
@@ -413,7 +417,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
-    public void getFabNovaImagem() {
+    public void getFabGaleria() {
         fabGaleria.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

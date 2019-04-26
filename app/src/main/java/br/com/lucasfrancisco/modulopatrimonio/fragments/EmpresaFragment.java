@@ -24,6 +24,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
@@ -75,23 +76,22 @@ public class EmpresaFragment extends Fragment {
         return view;
     }
 
-    public void pesquisar(String pesquisa) {
-        if (listEmpresas.contains(pesquisa)) {
-            Query query = collectionReference.whereEqualTo("codigo", pesquisa);
-            FirestoreRecyclerOptions<Empresa> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Empresa>().setQuery(query, Empresa.class).build();
-            empresaAdapter = new EmpresaAdapter(firestoreRecyclerOptions);
+    public void pesquisar(String pesquisa, String filtro, long limite) {
+        pesquisa = pesquisa.toUpperCase();
+        filtro = Normalizer.normalize(filtro, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toLowerCase(); // Remove acentos e muda para letras minúsculas
 
-            rcyEmpresas.setHasFixedSize(true);
-            rcyEmpresas.setLayoutManager(new LinearLayoutManager(getActivity()));
-            rcyEmpresas.setAdapter(empresaAdapter);
+        Query queryLocal = collectionReference.orderBy(filtro).startAt(pesquisa).endAt(pesquisa + "\uf8ff").limit(limite);
+        FirestoreRecyclerOptions<Empresa> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Empresa>().setQuery(queryLocal, Empresa.class).build();
+        empresaAdapter = new EmpresaAdapter(firestoreRecyclerOptions);
 
-            empresaAdapter.startListening();
+        rcyEmpresas.setHasFixedSize(true);
+        rcyEmpresas.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rcyEmpresas.setAdapter(empresaAdapter);
 
-            // getAdapterItemTouch();
-            getAdapterItemClick();
-        } else {
-            Toast.makeText(getActivity(), getString(R.string.empresa_nao_encontrada), Toast.LENGTH_SHORT).show();
-        }
+        empresaAdapter.startListening();
+
+        // getAdapterItemTouch();
+        getAdapterItemClick();
     }
 
     public void getListEmpresas() {
@@ -183,13 +183,6 @@ public class EmpresaFragment extends Fragment {
     public void onStop() {
         super.onStop();
         empresaAdapter.stopListening();
-    }
-
-    // Dados entre Fragments
-    public void getTextPesquisa(String texto, String filtro) {
-        if (texto != null) {
-            pesquisar(texto);
-        }
     }
 
     public ArrayList<String> setListFiltros() {

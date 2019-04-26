@@ -1,65 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/padding_linear_layout"
     tools:context=".activities.EditPatrimonioActivity">
 
-
-    <Spinner
-        android:id="@+id/spnEmpresa"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:prompt="@string/escolha_empresa"
-        android:spinnerMode="dialog" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/incTbrBottom">
 
-    <Spinner
-        android:id="@+id/spnSetor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/spnEmpresa"
-        android:prompt="@string/escolha_setor"
-        android:spinnerMode="dialog" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_linear_layout">
 
-    <EditText
-        android:id="@+id/edtPlaqueta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/spnSetor"
-        android:ems="10"
-        android:hint="@string/plaqueta"
-        android:inputType="number"
-        android:text="" />
+            <Spinner
+                android:id="@+id/spnEmpresa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/escolha_empresa"
+                android:spinnerMode="dialog" />
 
-    <EditText
-        android:id="@+id/edtTipo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtPlaqueta"
-        android:ems="10"
-        android:hint="@string/tipo"
-        android:inputType="textPersonName"
-        android:text="" />
+            <Spinner
+                android:id="@+id/spnSetor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spnEmpresa"
+                android:prompt="@string/escolha_setor"
+                android:spinnerMode="dialog" />
 
-    <EditText
-        android:id="@+id/edtMarca"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtTipo"
-        android:ems="10"
-        android:hint="@string/marca"
-        android:inputType="textPersonName"
-        android:text="" />
+            <EditText
+                android:id="@+id/edtPlaqueta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spnSetor"
+                android:ems="10"
+                android:hint="@string/plaqueta"
+                android:inputType="number"
+                android:text="" />
 
-    <EditText
-        android:id="@+id/edtModelo"
-        android:layout_width="match_parent"
+            <EditText
+                android:id="@+id/edtTipo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtPlaqueta"
+                android:ems="10"
+                android:hint="@string/tipo"
+                android:inputType="textPersonName"
+                android:text="" />
+
+            <EditText
+                android:id="@+id/edtMarca"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtTipo"
+                android:ems="10"
+                android:hint="@string/marca"
+                android:inputType="textPersonName"
+                android:text="" />
+
+            <EditText
+                android:id="@+id/edtModelo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtMarca"
+                android:ems="10"
+                android:hint="@string/modelo"
+                android:inputType="textPersonName"
+                android:text="" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcyImagens"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/edtModelo"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/famNovaImagem"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edtMarca"
-        android:ems="10"
-        android:hint="@string/modelo"
-        android:inputType="textPersonName"
-        android:text="" />
+        android:layout_above="@+id/incTbrBottom"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_colorPressed="@color/colorAccent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabGaleria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery_01"
+            app:fab_label="@string/galeria"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovaFoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_photo"
+            app:fab_label="@string/camera"
+            app:fab_size="mini" />
+    </com.github.clans.fab.FloatingActionMenu>
+
+    <include
+        android:id="@+id/incTbrBottom"
+        layout="@layout/toolbar_bottom_main" />
 
 </RelativeLayout>
