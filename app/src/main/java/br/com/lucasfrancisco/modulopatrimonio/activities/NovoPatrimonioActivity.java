@@ -475,6 +475,11 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Longo: " + posicao, Toast.LENGTH_SHORT).show();
                 return true;
             }
+
+            @Override
+            public void onDelete(View view, int posicao) {
+
+            }
         });
     }
 

@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.adapters.ImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.adapters.EditImagemAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
@@ -67,7 +67,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
     private List<Patrimonio> patrimonios;
     private Patrimonio patrimonio;
     private List<Imagem> imagens;
-    private ImagemAdapter imagemAdapter;
+    private List<Imagem> imagensRemoidas;
+    private EditImagemAdapter imagemAdapter;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
@@ -99,12 +100,13 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         fabGaleria = (FloatingActionButton) findViewById(R.id.fabGaleria);
         fabNovaFoto = (FloatingActionButton) findViewById(R.id.fabNovaFoto);
 
+        imagensRemoidas = new ArrayList<>();
         imagens = patrimonio.getImagens();
         for (int i = 0; i < imagens.size(); i++) {
             imagens.get(i).setUrlLocal(imagens.get(i).getUrlRemota());
         }
 
-        imagemAdapter = new ImagemAdapter(imagens, getApplicationContext());
+        imagemAdapter = new EditImagemAdapter(imagens, imagensRemoidas, getApplicationContext());
 
         rcyImagens.setHasFixedSize(true);
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
@@ -271,7 +273,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
                     if (patrimonio.getPlaqueta().equals(plaqueta)) {
-                        for (int i = 0; i < patrimonio.getImagens().size(); i++){
+                        for (int i = 0; i < patrimonio.getImagens().size(); i++) {
                             storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(patrimonio.getImagens().get(i).getUrlRemota());
                             storageReference.delete();
                         }
