@@ -5,13 +5,12 @@ Feito
     Implementado a adicação de imagem através da câmera
     Melhorado a adição de imagens para o Firebase
     Melhorado a performace do RecyclerView NovoPatrimonioActivity com a biblioteca Picasso
+    Implementado a exclusão de patrimônio e suas imagens
 
 
 Fazer
     Implementar a adicação de objetos em (Fragments)
-    Implementar exclusão de patriônio e suas imagens
     Implementar salvar patrimônio em segundo plano
     Implementar notificação para salvar e atualizar patrimônio
 
-    Continuar com br.com.lucasfrancisco.modulopatrimonio.adapters.EditImagemAdapter
 

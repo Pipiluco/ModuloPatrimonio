@@ -25,6 +25,9 @@ import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment {
+    private long backPressedTime;
+    private Toast backToast;
+
     private DrawerLayout dwlMain;
     private Toolbar tbMain;
     private NavigationView ngvMain;
@@ -57,12 +60,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        if (dwlMain.isDrawerOpen(GravityCompat.START)) {
+      /*  if (dwlMain.isDrawerOpen(GravityCompat.START)) {
             dwlMain.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        } */
+
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            backToast.cancel();
+            super.onBackPressed();
+            return;
+        } else {
+            backToast = Toast.makeText(getApplicationContext(), "Pressione novamente para sair!", Toast.LENGTH_SHORT);
+            backToast.show();
         }
+        backPressedTime = System.currentTimeMillis();
     }
+
 
     @Override
     protected void onStart() {

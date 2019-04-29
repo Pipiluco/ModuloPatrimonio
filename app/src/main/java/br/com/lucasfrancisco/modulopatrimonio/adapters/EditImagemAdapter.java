@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -19,13 +21,11 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 public class EditImagemAdapter extends RecyclerView.Adapter<EditImagemAdapter.ViewHolder> {
     private RCYViewClickListener rcyViewClickListener;
 
-    private List<Imagem> imagems;
-    private List<Imagem> imagensRemovidas;
+    private List<Imagem> imagens;
     private Context context;
 
-    public EditImagemAdapter(List<Imagem> imagems, List<Imagem> imagensRemovidas, Context context) {
-        this.imagems = imagems;
-        this.imagensRemovidas = imagensRemovidas;
+    public EditImagemAdapter(List<Imagem> imagens, Context context) {
+        this.imagens = imagens;
         this.context = context;
     }
 
@@ -37,22 +37,22 @@ public class EditImagemAdapter extends RecyclerView.Adapter<EditImagemAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        Imagem imagem = imagems.get(position);
+        Imagem imagem = imagens.get(position);
         viewHolder.tvNomeImagem.setText(imagem.getNome());
 
-        Picasso.with(context).load(imagem.getUrlLocal()).placeholder(R.drawable.ic_image).fit().centerCrop().into(viewHolder.imvImagem);
+        Picasso.with(context).load(imagem.getUrlRemota()).placeholder(R.drawable.ic_image).fit().centerCrop().into(viewHolder.imvImagem);
     }
 
     @Override
     public int getItemCount() {
-        return imagems.size();
+        return imagens.size();
     }
 
     public void excluir(int posicao) {
-        imagensRemovidas.add(imagems.get(posicao));
-        imagems.remove(posicao);
+        // Remove a imagem na lista local
+        imagens.remove(posicao);
         notifyItemRemoved(posicao);
-        notifyItemRangeChanged(posicao, imagems.size());
+        notifyItemRangeChanged(posicao, imagens.size());
     }
 
     public void setRcyViewClickListener(RCYViewClickListener rcyViewClickListener) {
@@ -61,7 +61,7 @@ public class EditImagemAdapter extends RecyclerView.Adapter<EditImagemAdapter.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView tvNomeImagem;
-        ImageView imvProgresso, imvImagem;
+        ImageView imvImagem;
 
         public ViewHolder(View itemView) {
             super(itemView);

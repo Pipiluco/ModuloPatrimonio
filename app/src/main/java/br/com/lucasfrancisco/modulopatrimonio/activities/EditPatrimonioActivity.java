@@ -67,7 +67,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
     private List<Patrimonio> patrimonios;
     private Patrimonio patrimonio;
     private List<Imagem> imagens;
-    private List<Imagem> imagensRemoidas;
     private EditImagemAdapter imagemAdapter;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -81,7 +80,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_patrimonio);
 
-        getListPatrimonios();
+        // getListPatrimonios();
 
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
 
@@ -100,13 +99,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         fabGaleria = (FloatingActionButton) findViewById(R.id.fabGaleria);
         fabNovaFoto = (FloatingActionButton) findViewById(R.id.fabNovaFoto);
 
-        imagensRemoidas = new ArrayList<>();
         imagens = patrimonio.getImagens();
-        for (int i = 0; i < imagens.size(); i++) {
-            imagens.get(i).setUrlLocal(imagens.get(i).getUrlRemota());
-        }
-
-        imagemAdapter = new EditImagemAdapter(imagens, imagensRemoidas, getApplicationContext());
+        imagemAdapter = new EditImagemAdapter(imagens, getApplicationContext());
 
         rcyImagens.setHasFixedSize(true);
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
@@ -137,6 +131,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                 return true;
             case R.id.itSalvar:
                 atualizar();
+                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
+                finish();
                 return true;
             case R.id.itExcluir:
                 excluir();
@@ -211,7 +207,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
             if (imagens.size() > 0) { // Salva patrimônio com imagem
                 for (int i = 0; i < imagens.size(); i++) {
                     final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
+                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios/" + plaqueta).child(nomeArquivo);
                     final int finalI = i;
 
                     if (!imagens.get(i).isEnviada()) { // Se a imagem já está salva no FirebaseStorage não será salva novamente
@@ -230,7 +226,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                                     collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
                                     patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
                                     collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -244,17 +239,13 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                             collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
                             patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
                             collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                            Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
-                finish();
             } else { // Salva patrimônio sem imagem
                 collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
                 patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
                 collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
-                finish();
             }
         }
     }
@@ -281,6 +272,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                         isPatrimonio = true;
                         documentReference.delete();
                         Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_excluido), Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }
                 if (!isPatrimonio) {
@@ -416,7 +408,15 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                imagemAdapter.excluir(viewHolder.getAdapterPosition());
+                // Remove a imagem no FirebaseStorage
+                if (imagens.get(viewHolder.getAdapterPosition()).getUrlRemota() != null) {
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imagens.get(viewHolder.getAdapterPosition()).getUrlRemota());
+                    storageReference.delete();
+                }
+
+                imagemAdapter.excluir(viewHolder.getAdapterPosition()); // Remove a imagem na lista local
+
+                atualizar();
             }
         }).attachToRecyclerView(rcyImagens);
     }
@@ -525,91 +525,3 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 }
-
-
-/*
-public void atualizar() {
-        String empresaVelha = (String) getIntent().getSerializableExtra("empresa");
-        String empresa = spnEmpresa.getSelectedItem().toString();
-        Setor setor = (Setor) spnSetor.getSelectedItem();
-        String plaqueta = edtPlaqueta.getText().toString();
-        String tipo = edtTipo.getText().toString();
-        String marca = edtMarca.getText().toString();
-        String modelo = edtModelo.getText().toString();
-        boolean isAtivo = true;
-        CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-        Patrimonio patrimonio;
-
-        if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
-            Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-        } else {
-            collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-            patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-            collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-            Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-
-     public void atualizar() {
-        final String empresaVelha = (String) getIntent().getSerializableExtra("empresa");
-        final String empresa = spnEmpresa.getSelectedItem().toString();
-        final Setor setor = (Setor) spnSetor.getSelectedItem();
-        final String plaqueta = edtPlaqueta.getText().toString();
-        final String tipo = edtTipo.getText().toString();
-        final String marca = edtMarca.getText().toString();
-        final String modelo = edtModelo.getText().toString();
-        final boolean isAtivo = true;
-        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-
-        if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
-            Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-        } else {
-            Log.d("Imagem", "" + imagens.size());
-            List<Imagem> novasImagens = new ArrayList<>();
-
-            if (imagens.size() > 0) { // Salva patrimônio com imagem
-                for (int i = 0; i < imagens.size(); i++) {
-                    final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios").child(nomeArquivo);
-                    final int finalI = i;
-
-                    if (!imagens.get(i).isEnviada()) { // Arrumar esta condição
-                        uploadReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                imagens.get(finalI).setEnviada(true);
-                                imagens.get(finalI).setNome(nomeArquivo);
-                                //
-                                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                while (!uriTask.isSuccessful()) ;
-                                imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
-                                imagemAdapter.notifyDataSetChanged();
-
-                                if (finalI == imagens.size() - 1) {
-                                    collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                                    patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-                                    collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                }
-                finish();
-            } else { // Salva patrimônio sem imagem
-                collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-                collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_atualizado), Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
- */

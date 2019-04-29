@@ -8,5 +8,4 @@ public interface RCYViewClickListener {
 
     public boolean onItemLongClick(View view, int posicao);
 
-    public void onDelete(View view, int posicao);
 }
