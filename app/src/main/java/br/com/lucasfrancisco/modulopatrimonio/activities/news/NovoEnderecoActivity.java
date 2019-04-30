@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
@@ -35,7 +36,7 @@ public class NovoEnderecoActivity extends AppCompatActivity {
 
         getListEnderecos();
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_endereco));
 
         edtRua = (EditText) findViewById(R.id.edtRua);

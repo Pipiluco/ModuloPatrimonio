@@ -31,13 +31,7 @@
             android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.news.NovoEnderecoActivity"
-            android:parentActivityName=".activities.MainActivity">
-            <meta-data
-                android:name="parentActivityName"
-                android:value="br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment" />
-        </activity>
-
-
+            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.edits.EditEnderecoActivity"
             android:parentActivityName=".activities.MainActivity" />
@@ -45,6 +39,9 @@
             android:name=".activities.news.NovoSetorActivity"
             android:parentActivityName=".activities.MainActivity" />
         <activity android:name=".activities.edits.EditPatrimonioActivity" />
+        <activity
+            android:name=".activities.news.NovoObjetoActivity"
+            android:parentActivityName=".activities.MainActivity" />
     </application>
 
 </manifest>

@@ -54,6 +54,7 @@ import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.ImagemAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
+import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
@@ -62,8 +63,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private static final int REQUEST_SCAN_CODE = 101;
     private static final int REQUEST_CAMERA_CODE = 3;
 
-    private Spinner spnEmpresa, spnSetor;
-    private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
+    private Spinner spnEmpresa, spnSetor, spnObjeto;
+    private EditText edtPlaqueta;
     private ImageButton imbScanner;
     private RecyclerView rcyImagens;
     private FloatingActionButton fabNovaFoto, fabGaleria;
@@ -97,10 +98,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
         spnSetor = (Spinner) findViewById(R.id.spnSetor);
+        spnObjeto = (Spinner) findViewById(R.id.spnObjeto);
         edtPlaqueta = (EditText) findViewById(R.id.edtPlaqueta);
-        edtTipo = (EditText) findViewById(R.id.edtTipo);
-        edtMarca = (EditText) findViewById(R.id.edtMarca);
-        edtModelo = (EditText) findViewById(R.id.edtModelo);
         imbScanner = (ImageButton) findViewById(R.id.imbScanner);
         rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
         fabNovaFoto = (FloatingActionButton) findViewById(R.id.fabNovaFoto);
@@ -121,6 +120,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         getPermissoes();
         getSpinnerEmpresas();
+        getSpinnerObjetos();
         getFabNovaFoto();
         getFabGaleria();
         getTbrBottomMain();
@@ -188,11 +188,9 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
 
         final Setor setor = (Setor) spnSetor.getSelectedItem();
+        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
         final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
         final String plaqueta = edtPlaqueta.getText().toString();
-        final String tipo = edtTipo.getText().toString();
-        final String marca = edtMarca.getText().toString();
-        final String modelo = edtModelo.getText().toString();
         Boolean isPatrimonio = false;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
@@ -205,7 +203,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
 
         if (!isPatrimonio) {
-            if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
+            if (plaqueta.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
                 progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
@@ -232,7 +230,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                                 imagemAdapter.notifyDataSetChanged();
 
                                 if (finalI == imagens.size() - 1) {
-                                    Patrimonio patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
+                                    Patrimonio patrimonio = new Patrimonio(plaqueta, true, setor, objeto, imagens); // imagens
                                     collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                                     cleanForm();
@@ -254,7 +252,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                         });
                     }
                 } else { // Salva patrimônio sem imagem
-                    Patrimonio patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
+                    Patrimonio patrimonio = new Patrimonio(plaqueta, true, setor, objeto, imagens); // imagens
                     collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                     cleanForm();
@@ -410,6 +408,23 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
+    private void getSpinnerObjetos() {
+        final List<Objeto> list = new ArrayList<>();
+        CollectionReference collectionReference = firebaseFirestore.collection("Objetos");
+
+        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Objeto objeto = documentSnapshot.toObject(Objeto.class);
+                    list.add(objeto);
+                }
+                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                spnObjeto.setAdapter(adapter);
+            }
+        });
+    }
+
     public void getFabNovaFoto() {
         fabNovaFoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -542,9 +557,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     // Limpa campos de texto e lista
     public void cleanForm() {
         edtPlaqueta.setText("");
-        edtTipo.setText("");
-        edtMarca.setText("");
-        edtModelo.setText("");
         imagens.clear();
         imagemAdapter.notifyDataSetChanged();
     }

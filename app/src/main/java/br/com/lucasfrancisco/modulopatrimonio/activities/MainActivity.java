@@ -1,5 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,9 +17,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovaEmpresaActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoObjetoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.ObjetoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
@@ -28,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toast backToast;
 
     private DrawerLayout dwlMain;
-    private Toolbar tbMain;
+    private Toolbar tbrTopMain, tbrBottomMain;
     private NavigationView ngvMain;
 
     // Fragment
@@ -44,26 +50,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
         sharedPreferencesEmpresa.inserir(getApplicationContext());
 
-        tbMain = (Toolbar) findViewById(R.id.tbMain);
-        setSupportActionBar(tbMain);
+        tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
+        getTbrBottomMain();
+
+        tbrTopMain = (Toolbar) findViewById(R.id.tbrTopMain);
+        setSupportActionBar(tbrTopMain);
 
         dwlMain = (DrawerLayout) findViewById(R.id.dwlMain);
 
         ngvMain = (NavigationView) findViewById(R.id.ngvMain);
         ngvMain.setNavigationItemSelectedListener(this);
 
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, dwlMain, tbMain, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, dwlMain, tbrTopMain, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         dwlMain.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }
 
     @Override
     public void onBackPressed() {
-      /*  if (dwlMain.isDrawerOpen(GravityCompat.START)) {
+        if (dwlMain.isDrawerOpen(GravityCompat.START)) {
             dwlMain.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        } */
+        }
 
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
             backToast.cancel();
@@ -102,8 +109,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EnderecoFragment()).commit();
                 setFragment(new EnderecoFragment());
                 break;
-            case R.id.itPerfil:
-                Toast.makeText(getApplicationContext(), "Perfil", Toast.LENGTH_SHORT).show();
+            case R.id.itObjeto:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new ObjetoFragment()).commit();
+                setFragment(new ObjetoFragment());
                 break;
             case R.id.itShare:
                 Toast.makeText(getApplicationContext(), "Compartilhar", Toast.LENGTH_SHORT).show();
@@ -116,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return true;
     }
-
 
     // Dados entre Fragments
     public Fragment getFragment() {
@@ -140,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (fragment instanceof EnderecoFragment) {
             EnderecoFragment enderecoFragment = (EnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             enderecoFragment.pesquisar(texto, filtro, limite);
+        } else if (fragment instanceof ObjetoFragment) {
+            ObjetoFragment objetoFragment = (ObjetoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            objetoFragment.pesquisar(texto, filtro, limite);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }
@@ -149,6 +160,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onSetFilter(ArrayList arrayList) { // Passa o ArrayList que veio dos fragments para o PesquisaFragment
         PesquisaFragment pesquisaFragment = (PesquisaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlPesquisa);
         pesquisaFragment.setFilter(arrayList);
+    }
+
+    // Toolbar inferior
+    public void getTbrBottomMain() {
+        tbrBottomMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Intent intent = null;
+
+                switch (menuItem.getItemId()) {
+                    case R.id.itPatrimonio:
+                        intent = new Intent(getApplicationContext(), NovoPatrimonioActivity.class);
+                        break;
+                    case R.id.itEmpresa:
+                        intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                        break;
+                    case R.id.itEndereco:
+                        intent = new Intent(getApplicationContext(), NovoEnderecoActivity.class);
+                        break;
+                    case R.id.itObjeto:
+                        intent = new Intent(getApplicationContext(), NovoObjetoActivity.class);
+                        break;
+                }
+                startActivity(intent);
+                return true;
+            }
+        });
+        tbrBottomMain.inflateMenu(R.menu.menu_toolbar_main);
     }
 }
 

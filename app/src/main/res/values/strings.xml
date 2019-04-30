@@ -1,57 +1,69 @@
 <resources>
-    <string name="app_name">Modulo Patrimônio</string>
-
     <!-- Palavras -->
-    <string name="tipo">Tipo</string>
-    <string name="marca">Marca</string>
     <string name="bairro">Bairro</string>
     <string name="bloco">Bloco</string>
+
     <string name="camera">Câmera</string>
     <string name="cep">CEP</string>
     <string name="cidade">Cidade</string>
+    <string name="cnpj">CNPJ</string>
+    <string name="codigo">Código</string>
     <string name="cor">Cor</string>
-    <string name="de">de</string>
-    <string name="editar">Editar</string>
-    <string name="estado">Estado</string>
-    <string name="excluir">Excluir</string>
-    <string name="imagem">Imagem</string>
-    <string name="galeria">Galeria</string>
-    <string name="limite">Limite</string>
-    <string name="modelo">Modelo</string>
-    <string name="numero">Número</string>
-    <string name="pais">País</string>
-    <string name="pesquisa">Pesquisa</string>
-    <string name="plaqueta">Plaqueta</string>
-    <string name="rua">Rua</string>
-    <string name="sala">Sala</string>
-    <string name="salvando">Salvando</string>
-    <string name="setor">Setor</string>
-    <string name="setores">Setores</string>
-    <string name="nome">Nome</string>
 
-    <string name="patrimonio">Patrimônio</string>
-    <string name="endereco">Endereço</string>
+    <string name="de">de</string>
+
+    <string name="editar">Editar</string>
     <string name="empresa">Empresa</string>
     <string name="empresas">Empresas</string>
-    <string name="perfil">Perfil</string>
-
+    <string name="endereco">Endereço</string>
+    <string name="estado">Estado</string>
+    <string name="excluir">Excluir</string>
 
     <string name="fantasia">Fantasia</string>
-    <string name="codigo">Código</string>
-    <string name="cnpj">CNPJ</string>
-
-    <string name="novo">Novo</string>
-    <string name="nova">Nova</string>
-    <string name="xls">XLS</string>
-    <string name="salvar">Salvar</string>
     <string name="filtrar">Filtrar</string>
     <string name="filtro">Filtro</string>
 
+    <string name="imagem">Imagem</string>
 
+    <string name="galeria">Galeria</string>
+
+    <string name="limite">Limite</string>
+
+    <string name="marca">Marca</string>
+    <string name="modelo">Modelo</string>
+
+    <string name="nome">Nome</string>
+    <string name="nova">Nova</string>
+    <string name="novo">Novo</string>
+    <string name="numero">Número</string>
+
+    <string name="pais">País</string>
+    <string name="patrimonio">Patrimônio</string>
+    <string name="perfil">Perfil</string>
+    <string name="pesquisa">Pesquisa</string>
     <string name="pesquisar">Pesquisar</string>
+    <string name="plaqueta">Plaqueta</string>
+
+    <string name="objeto">Objeto</string>
+    <string name="objetos">Objetos</string>
+
+    <string name="rua">Rua</string>
+
+    <string name="sala">Sala</string>
+    <string name="salvando">Salvando</string>
+    <string name="salvar">Salvar</string>
+    <string name="setor">Setor</string>
+    <string name="setores">Setores</string>
+
+    <string name="tipo">Tipo</string>
+
+    <string name="xls">XLS</string>
+
 
     <!-- Frases -->
     <string name="aponte_a_camera_para_codigo">Aponte a câmera para um QR code ou código de barras!</string>
+    <string name="app_name">Modulo Patrimônio</string>
+
     <string name="dados_incompletos">Dados incompletos!</string>
 
     <string name="empresa_ja_existe">Já existe empresa salva com este código!</string>
@@ -65,6 +77,7 @@
     <string name="escolha_empresa">Escolha uma empresa</string>
     <string name="escolha_endereco">Escolha um endereço</string>
     <string name="escolha_filtro">Escolha um filtro</string>
+    <string name="escolha_objeto">Escolha um objeto</string>
     <string name="escolha_setor">Escolha um setor</string>
 
     <string name="imagem_ja_esta_na_lista">Imagem com mesmo nome na lista!</string>
@@ -77,6 +90,7 @@
     <string name="nova_empresa">Nova empresa</string>
     <string name="novo_endereco">Novo endereço</string>
     <string name="novo_patrimonio">Novo patrimônio</string>
+    <string name="novo_objeto">Novo objeto</string>
     <string name="novo_setor">Novo setor</string>
 
     <string name="patrimonio_atualizado">Patrimônio atualizado!</string>
@@ -85,6 +99,9 @@
     <string name="patrimonio_nao_encontrado">Patrimônio não encontrado!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
     <string name="por_favor_aguarde">Por favor, aguarde!</string>
+
+    <string name="objeto_ja_existe">Já existe objeto salvo com estes dados!</string>
+    <string name="objeto_salvo">Objeto salvo!</string>
 
     <string name="sem_resultado">Sem resultado!</string>
     <string name="setor_ja_existe">Já existe setor salvo com estas informações!</string>

@@ -20,4 +20,10 @@
         android:title="@string/endereco"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/itObjeto"
+        android:icon="@drawable/ic_gallery_01"
+        android:title="@string/objeto"
+        app:showAsAction="always" />
+
 </menu>

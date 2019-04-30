@@ -237,13 +237,14 @@ public class PatrimonioFragment extends Fragment {
                 intent.putExtra("patrimonio", patrimonio);
                 intent.putExtra("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
                 intent.putExtra("setor", patrimonio.getSetor().getBloco() + " - " + patrimonio.getSetor().getSala());
+                intent.putExtra("objeto", patrimonio.getObjeto().getTipo() + " - " + patrimonio.getObjeto().getMarca() + " " + patrimonio.getObjeto().getModelo());
                 startActivity(intent);
             }
 
             @Override
             public boolean onItemLongClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
-                Toast.makeText(getActivity(), "Marca: " + patrimonio.getMarca(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Marca: " + patrimonio.getObjeto().getMarca(), Toast.LENGTH_SHORT).show();
                 return true;
             }
         });

@@ -41,4 +41,9 @@ public class Objeto implements Serializable {
     public void setModelo(String modelo) {
         this.modelo = modelo;
     }
+
+    @Override
+    public String toString() {
+        return this.tipo + " - " + this.marca + " " + this.modelo;
+    }
 }

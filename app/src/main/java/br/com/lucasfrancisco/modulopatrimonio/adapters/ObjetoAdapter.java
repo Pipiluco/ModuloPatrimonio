@@ -9,13 +9,13 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
 
 public class ObjetoAdapter extends FirestoreRecyclerAdapter<Objeto, ObjetoAdapter.ObjetoHolder> {
-    private OnItemClickListener onItemClickListener;
+    private RCYDocumentSnapshotClickListener rcyDocumentSnapshotClickListener;
 
     public ObjetoAdapter(@NonNull FirestoreRecyclerOptions<Objeto> options) {
         super(options);
@@ -39,36 +39,41 @@ public class ObjetoAdapter extends FirestoreRecyclerAdapter<Objeto, ObjetoAdapte
         getSnapshots().getSnapshot(posicao).getReference().delete();
     }
 
-    class ObjetoHolder extends RecyclerView.ViewHolder {
-        TextView tvTipo, tvCor, tvMarca, tvModelo;
+    public void setRcyDocumentSnapshotClickListener(RCYDocumentSnapshotClickListener rcyDocumentSnapshotClickListener) {
+        this.rcyDocumentSnapshotClickListener = rcyDocumentSnapshotClickListener;
+    }
+
+    public class ObjetoHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        TextView tvTipo, tvMarca, tvModelo;
 
         public ObjetoHolder(@NonNull View itemView) {
             super(itemView);
 
             tvTipo = (TextView) itemView.findViewById(R.id.tvTipo);
-            tvCor = (TextView) itemView.findViewById(R.id.tvCor);
             tvMarca = (TextView) itemView.findViewById(R.id.tvMarca);
             tvModelo = (TextView) itemView.findViewById(R.id.tvModelo);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int posicao = getAdapterPosition();
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
 
-                    if (posicao != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                        onItemClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
-                    }
-                }
-            });
+        @Override
+        public void onClick(View v) {
+            int posicao = getAdapterPosition();
+
+            if (posicao != RecyclerView.NO_POSITION && rcyDocumentSnapshotClickListener != null) {
+                rcyDocumentSnapshotClickListener.onItemClick(getSnapshots().getSnapshot(posicao), posicao);
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            int posicao = getAdapterPosition();
+
+            if (posicao != RecyclerView.NO_POSITION && rcyDocumentSnapshotClickListener != null) {
+                rcyDocumentSnapshotClickListener.onItemLongClick(getSnapshots().getSnapshot(posicao), posicao);
+            }
+            return true;
         }
     }
-
-    public interface OnItemClickListener {
-        void onItemClick(DocumentSnapshot documentSnapshot, int posicao);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-    }
-
 }

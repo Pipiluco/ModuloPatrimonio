@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
@@ -25,9 +27,11 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
     protected void onBindViewHolder(@NonNull PatrimonioHolder holder, int position, @NonNull Patrimonio model) {
         String empresa = model.getSetor().getEmpresa().getFantasia() + " " + model.getSetor().getEmpresa().getEndereco().getCidade();
         String setor = model.getSetor().getBloco() + " - " + model.getSetor().getSala();
+        String tipo = model.getObjeto().getTipo();
+
         holder.tvPlaqueta.setText(model.getPlaqueta());
         holder.tvEmpresa.setText(empresa);
-        holder.tvTipo.setText(model.getTipo());
+        holder.tvTipo.setText(tipo);
         holder.tvSetor.setText(setor);
     }
 
@@ -39,6 +43,13 @@ public class PatrimonioAdapter extends FirestoreRecyclerAdapter<Patrimonio, Patr
     }
 
     public void excluir(int posicao) {
+        Patrimonio patrimonio = getSnapshots().getSnapshot(posicao).toObject(Patrimonio.class);
+        StorageReference storageReference;
+
+        for (int i = 0; i < patrimonio.getImagens().size(); i++) {
+            storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(patrimonio.getImagens().get(i).getUrlRemota());
+            storageReference.delete();
+        }
         getSnapshots().getSnapshot(posicao).getReference().delete();
     }
 

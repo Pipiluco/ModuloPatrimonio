@@ -9,13 +9,12 @@
     tools:context=".activities.MainActivity"
     tools:openDrawer="start">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/tbMain"
+            android:id="@+id/tbrTopMain"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
@@ -31,9 +30,14 @@
         <FrameLayout
             android:id="@+id/fmlConteudo"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_above="@+id/incTbrBottom"
+            android:layout_below="@+id/tbrTopMain" />
 
-    </LinearLayout>
+        <include
+            android:id="@+id/incTbrBottom"
+            layout="@layout/toolbar_bottom_main" />
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/ngvMain"

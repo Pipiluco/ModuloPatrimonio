@@ -47,6 +47,7 @@ import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EditImagemAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
+import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
 
@@ -54,8 +55,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
     private static final int REQUEST_LOAD_IMAGE = 1;
     private static final int REQUEST_CAMERA_CODE = 3;
 
-    private Spinner spnEmpresa, spnSetor;
-    private EditText edtPlaqueta, edtTipo, edtMarca, edtModelo;
+    private Spinner spnEmpresa, spnSetor, spnObjeto;
+    private EditText edtPlaqueta;
     private RecyclerView rcyImagens;
     private FloatingActionMenu famNovaImagem;
     private FloatingActionButton fabGaleria, fabNovaFoto;
@@ -89,10 +90,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
         spnSetor = (Spinner) findViewById(R.id.spnSetor);
+        spnObjeto = (Spinner) findViewById(R.id.spnObjeto);
         edtPlaqueta = (EditText) findViewById(R.id.edtPlaqueta);
-        edtTipo = (EditText) findViewById(R.id.edtTipo);
-        edtMarca = (EditText) findViewById(R.id.edtMarca);
-        edtModelo = (EditText) findViewById(R.id.edtModelo);
         rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
         famNovaImagem = (FloatingActionMenu) findViewById(R.id.famNovaImagem);
         fabGaleria = (FloatingActionButton) findViewById(R.id.fabGaleria);
@@ -107,12 +106,10 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
         // Seta os valores vindos do PatrimonioFragment
         edtPlaqueta.setText(patrimonio.getPlaqueta());
-        edtTipo.setText(patrimonio.getTipo());
-        edtMarca.setText(patrimonio.getMarca());
-        edtModelo.setText(patrimonio.getModelo());
 
         desativaEdicao();
         getSpinnerEmpresas();
+        getSpinnerObjetos();
     }
 
     @Override
@@ -161,10 +158,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         isEdit = true;
         spnEmpresa.setEnabled(true);
         spnSetor.setEnabled(true);
+        spnObjeto.setEnabled(true);
         edtPlaqueta.setEnabled(false); // A plaqueta nunca deve ser alterada
-        edtTipo.setEnabled(true);
-        edtMarca.setEnabled(true);
-        edtModelo.setEnabled(true);
         famNovaImagem.setVisibility(View.VISIBLE);
         getFabNovaFoto();
         getFabGaleria();
@@ -177,10 +172,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         isEdit = false;
         spnEmpresa.setEnabled(false);
         spnSetor.setEnabled(false);
+        spnObjeto.setEnabled(false);
         edtPlaqueta.setEnabled(false);
-        edtTipo.setEnabled(false);
-        edtMarca.setEnabled(false);
-        edtModelo.setEnabled(false);
         famNovaImagem.setVisibility(View.INVISIBLE);
 
         return isEdit;
@@ -190,61 +183,54 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         final String empresaVelha = (String) getIntent().getSerializableExtra("empresa");
         final String empresa = spnEmpresa.getSelectedItem().toString();
         final Setor setor = (Setor) spnSetor.getSelectedItem();
+        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
         final String plaqueta = edtPlaqueta.getText().toString();
-        final String tipo = edtTipo.getText().toString();
-        final String marca = edtMarca.getText().toString();
-        final String modelo = edtModelo.getText().toString();
+
         final boolean isAtivo = true;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
-        if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
-            Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-        } else {
-            List<Imagem> novasImagens = new ArrayList<>();
+        if (imagens.size() > 0) { // Salva patrimônio com imagem
+            for (int i = 0; i < imagens.size(); i++) {
+                final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
+                StorageReference uploadReference = storageReference.child("Imagens/Patrimonios/" + plaqueta).child(nomeArquivo);
+                final int finalI = i;
 
-            if (imagens.size() > 0) { // Salva patrimônio com imagem
-                for (int i = 0; i < imagens.size(); i++) {
-                    final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                    StorageReference uploadReference = storageReference.child("Imagens/Patrimonios/" + plaqueta).child(nomeArquivo);
-                    final int finalI = i;
+                if (!imagens.get(i).isEnviada()) { // Se a imagem já está salva no FirebaseStorage não será salva novamente
+                    uploadReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            imagens.get(finalI).setEnviada(true);
+                            imagens.get(finalI).setNome(nomeArquivo);
+                            //
+                            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!uriTask.isSuccessful()) ;
+                            imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
+                            imagemAdapter.notifyDataSetChanged();
 
-                    if (!imagens.get(i).isEnviada()) { // Se a imagem já está salva no FirebaseStorage não será salva novamente
-                        uploadReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                imagens.get(finalI).setEnviada(true);
-                                imagens.get(finalI).setNome(nomeArquivo);
-                                //
-                                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                while (!uriTask.isSuccessful()) ;
-                                imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
-                                imagemAdapter.notifyDataSetChanged();
-
-                                if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
-                                    collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                                    patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-                                    collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                                }
+                            if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
+                                collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
+                                patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+                                collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    } else {
-                        if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
-                            collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                            patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-                            collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                         }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
+                        collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
+                        patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+                        collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     }
                 }
-            } else { // Salva patrimônio sem imagem
-                collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, isAtivo, setor, imagens);
-                collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
             }
+        } else { // Salva patrimônio sem imagem
+            collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
+            patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+            collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
         }
     }
 
@@ -361,6 +347,32 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
                     }
                 });
+            }
+        });
+    }
+
+    private void getSpinnerObjetos() {
+        final List<Objeto> list = new ArrayList<>();
+        CollectionReference collectionReference = firebaseFirestore.collection("Objetos");
+
+        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Objeto objeto = documentSnapshot.toObject(Objeto.class);
+                    list.add(objeto);
+                }
+                adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                spnObjeto.setAdapter(adapter);
+
+                // Seta o setor do patrimônio no spnSetor como primeiro item
+                String objeto = (String) getIntent().getSerializableExtra("objeto");
+                for (int i = 0; i < spnObjeto.getCount(); i++) {
+                    if (spnObjeto.getItemAtPosition(i).toString().equals(objeto)) {
+                        spnObjeto.setSelection(i);
+                        break;
+                    }
+                }
             }
         });
     }

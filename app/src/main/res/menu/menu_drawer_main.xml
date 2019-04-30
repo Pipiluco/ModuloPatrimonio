@@ -20,9 +20,9 @@
             android:title="@string/endereco" />
 
         <item
-            android:id="@+id/itPerfil"
+            android:id="@+id/itObjeto"
             android:icon="@drawable/ic_add"
-            android:title="@string/perfil" />
+            android:title="@string/objeto" />
     </group>
 
     <item android:title="Comunicação">
