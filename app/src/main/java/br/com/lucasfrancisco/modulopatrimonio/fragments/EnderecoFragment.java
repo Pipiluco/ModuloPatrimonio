@@ -25,8 +25,8 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.EditEnderecoActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.NovoEnderecoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.edits.EditEnderecoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;

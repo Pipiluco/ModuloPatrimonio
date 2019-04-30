@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.activities;
+package br.com.lucasfrancisco.modulopatrimonio.activities.news;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,29 +17,26 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 
-public class EditEnderecoActivity extends AppCompatActivity {
+public class NovoEnderecoActivity extends AppCompatActivity {
     private EditText edtRua, edtNumero, edtCEP, edtBairro, edtCidade, edtEstado, edtPais;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
     private ArrayList<String> listEnderecos;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_endereco);
+        setContentView(R.layout.activity_novo_endereco);
 
         getListEnderecos();
 
-        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
-
-        Endereco endereco = (Endereco) getIntent().getSerializableExtra("endereco");
-
-        setTitle(endereco.getCEP() + " - " + endereco.getRua() + " - " + endereco.getNumero());
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        setTitle(getString(R.string.novo_endereco));
 
         edtRua = (EditText) findViewById(R.id.edtRua);
         edtNumero = (EditText) findViewById(R.id.edtNumero);
@@ -48,64 +45,27 @@ public class EditEnderecoActivity extends AppCompatActivity {
         edtCidade = (EditText) findViewById(R.id.edtCidade);
         edtEstado = (EditText) findViewById(R.id.edtEstado);
         edtPais = (EditText) findViewById(R.id.edtPais);
-
-        edtRua.setText(endereco.getRua());
-        edtNumero.setText(String.valueOf(endereco.getNumero()));
-        edtCEP.setText(endereco.getCEP());
-        edtBairro.setText(endereco.getBairro());
-        edtCidade.setText(endereco.getCidade());
-        edtEstado.setText(endereco.getEstado());
-        edtPais.setText(endereco.getPais());
-
-        desativaEdicao();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_opcoes_objeto, menu);
+        menuInflater.inflate(R.menu.menu_salvar, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.itEditar:
-                ativaEdicao();
-                return true;
             case R.id.itSalvar:
-                atualizar();
-                return true;
-            case R.id.itExcluir:
-                excluir();
+                salvar();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void ativaEdicao() {
-        // edtRua.setEnabled(true);
-        // edtNumero.setEnabled(true);
-        // edtCEP.setEnabled(true);
-        edtBairro.setEnabled(true);
-        edtCidade.setEnabled(true);
-        edtEstado.setEnabled(true);
-        edtPais.setEnabled(true);
-    }
-
-    public void desativaEdicao() {
-        edtRua.setEnabled(false);
-        edtNumero.setEnabled(false);
-        edtCEP.setEnabled(false);
-        edtBairro.setEnabled(false);
-        edtCidade.setEnabled(false);
-        edtEstado.setEnabled(false);
-        edtPais.setEnabled(false);
-    }
-
-    public void atualizar() {
+    public void salvar() {
         String rua = edtRua.getText().toString();
         String numero = edtNumero.getText().toString();
         String cep = edtCEP.getText().toString();
@@ -114,41 +74,42 @@ public class EditEnderecoActivity extends AppCompatActivity {
         String estado = edtEstado.getText().toString();
         String pais = edtPais.getText().toString();
         String documento = cep + " - " + rua + " - " + numero;
+        Boolean isEndereco = false;
         CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
         Endereco endereco;
 
         Log.d("Endereços", "" + listEnderecos.size());
 
-        if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
-            Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-        } else {
-            endereco = new Endereco(rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
-            collectionReference.document(documento).set(endereco);
-            Toast.makeText(getApplicationContext(), getString(R.string.endereco_atualizado), Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-    public void excluir() {
-        String rua = edtRua.getText().toString();
-        String numero = edtNumero.getText().toString();
-        String cep = edtCEP.getText().toString();
-        String documento = cep + " - " + rua + " - " + numero;
-        Boolean isEndereco = false;
-        CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
-
         if (listEnderecos != null) {
             for (int i = 0; i < listEnderecos.size(); i++) {
                 if (documento.equals(listEnderecos.get(i))) {
                     isEndereco = true;
-                    collectionReference.document(documento).delete();
-                    Toast.makeText(getApplicationContext(), getString(R.string.endereco_excluido), Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(getApplicationContext(), getString(R.string.endereco_ja_existe) + " (" + documento + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             if (!isEndereco) {
-                Toast.makeText(getApplicationContext(), getString(R.string.endereco_nao_encontrado), Toast.LENGTH_SHORT).show();
+                if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+                } else {
+                    endereco = new Endereco(rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                    collectionReference.document(documento).set(endereco);
+                    Toast.makeText(getApplicationContext(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
+                    getListEnderecos();
+                    isEndereco = true;
+                    finish();
+                }
+            }
+        } else {
+            if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
+                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+            } else {
+                endereco = new Endereco(rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                collectionReference.document(documento).set(endereco);
+                Toast.makeText(getApplicationContext(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
+                getListEnderecos();
+                isEndereco = true;
+                finish();
             }
         }
     }

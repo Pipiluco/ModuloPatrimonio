@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_linear_layout"
-    tools:context=".activities.NovoSetorActivity">
+    tools:context=".activities.news.NovoSetorActivity">
 
     <Spinner
         android:id="@+id/spnEmpresa"

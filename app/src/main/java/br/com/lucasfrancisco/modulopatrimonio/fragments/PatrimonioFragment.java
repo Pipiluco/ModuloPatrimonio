@@ -32,8 +32,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.EditPatrimonioActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.NovoPatrimonioActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.edits.EditPatrimonioActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;

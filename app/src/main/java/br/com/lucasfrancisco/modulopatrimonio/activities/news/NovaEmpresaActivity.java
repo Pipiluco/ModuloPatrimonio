@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.activities;
+package br.com.lucasfrancisco.modulopatrimonio.activities.news;
 
 import android.content.Intent;
 import android.os.Bundle;

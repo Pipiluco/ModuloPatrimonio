@@ -1,6 +1,8 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
-public class Usuario {
+import java.io.Serializable;
+
+public class Usuario implements Serializable {
     private String nome;
     private String sobrenome;
     private String cargo;

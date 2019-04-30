@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.activities;
+package br.com.lucasfrancisco.modulopatrimonio.activities.news;
 
 import android.Manifest;
 import android.app.Activity;
@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,6 +82,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private Activity activity = this;
     private Uri uriImagemCamera;
 
+    private NotificationManagerCompat notificationManagerCompat;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,6 +110,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         imagens = new ArrayList<>();
         imagemAdapter = new ImagemAdapter(imagens, getApplicationContext());
+
+        notificationManagerCompat = NotificationManagerCompat.from(this);
 
         rcyImagens.setLayoutManager(new LinearLayoutManager(this));
         rcyImagens.setHasFixedSize(true);
@@ -203,7 +208,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                //
                 progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
                 progressDialog.setMessage(getString(R.string.por_favor_aguarde));
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -218,10 +222,10 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                         uploadReference.putFile(Uri.parse(imagens.get(finalI).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                progressDialog.setMessage("Salvando " + finalI + " de " + imagens.size());
+                                progressDialog.setMessage(getString(R.string.salvando) + " " + finalI + " " + getString(R.string.de) + " " + imagens.size());
                                 imagens.get(finalI).setEnviada(true);
                                 imagens.get(finalI).setNome(nomeArquivo);
-                                //
+
                                 Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                 while (!uriTask.isSuccessful()) ;
                                 imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
@@ -246,94 +250,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                             @Override
                             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            }
-                        });
-                    }
-                } else { // Salva patrimônio sem imagem
-                    Patrimonio patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
-                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
-                    cleanForm();
-                    progressDialog.cancel();
-                    getListPatrimonios();
-                }
-            }
-        }
-    }
-
-    // Salva patrimônio
-    public void salvar2() { // Estável OK
-        storageReference = FirebaseStorage.getInstance().getReference();
-        getListPatrimonios();
-
-        if (spnEmpresa.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (spnSetor.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        final Setor setor = (Setor) spnSetor.getSelectedItem();
-        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
-        final String plaqueta = edtPlaqueta.getText().toString();
-        final String tipo = edtTipo.getText().toString();
-        final String marca = edtMarca.getText().toString();
-        final String modelo = edtModelo.getText().toString();
-        Boolean isPatrimonio = false;
-        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-
-        // Verifica se o patrimônio já existe no banco
-        for (int i = 0; i < listPatrimonios.size(); i++) {
-            if (plaqueta.equals(listPatrimonios.get(i))) {
-                isPatrimonio = true;
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        if (!isPatrimonio) {
-            if (plaqueta.trim().isEmpty() || tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
-                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-            } else {
-                //
-                progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
-                progressDialog.setMessage(getString(R.string.por_favor_aguarde));
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-
-                if (imagens.size() > 0) { // Salva patrimônio com imagem
-                    for (int i = 0; i < imagens.size(); i++) {
-                        final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                        StorageReference uploadReference = storageReference.child("Imagens/Patrimonios/" + plaqueta).child(nomeArquivo);
-                        final int finalI = i;
-
-                        uploadReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                imagens.get(finalI).setEnviada(true);
-                                imagens.get(finalI).setNome(nomeArquivo);
-                                //
-                                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                while (!uriTask.isSuccessful()) ;
-                                imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
-                                imagemAdapter.notifyDataSetChanged();
-
-                                if (finalI == imagens.size() - 1) {
-                                    Patrimonio patrimonio = new Patrimonio(tipo, marca, modelo, plaqueta, true, setor, imagens); // imagens
-                                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
-                                    cleanForm();
-                                    progressDialog.cancel();
-                                    getListPatrimonios();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.cancel();
-                                Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
                             }
                         });
                     }

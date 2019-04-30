@@ -1,6 +1,5 @@
 package br.com.lucasfrancisco.modulopatrimonio.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -104,8 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 setFragment(new EnderecoFragment());
                 break;
             case R.id.itPerfil:
-                Intent intent = new Intent(MainActivity.this, NovoObjetoActivity.class);
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Perfil", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.itShare:
                 Toast.makeText(getApplicationContext(), "Compartilhar", Toast.LENGTH_SHORT).show();

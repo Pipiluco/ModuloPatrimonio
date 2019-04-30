@@ -28,7 +28,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.NovaEmpresaActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovaEmpresaActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EmpresaAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;

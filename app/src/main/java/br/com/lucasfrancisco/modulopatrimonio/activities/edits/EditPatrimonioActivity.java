@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.activities;
+package br.com.lucasfrancisco.modulopatrimonio.activities.edits;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -201,7 +200,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
             Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
         } else {
-            Log.d("Imagem", "" + imagens.size());
             List<Imagem> novasImagens = new ArrayList<>();
 
             if (imagens.size() > 0) { // Salva patrimônio com imagem

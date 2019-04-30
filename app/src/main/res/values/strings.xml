@@ -10,6 +10,7 @@
     <string name="cep">CEP</string>
     <string name="cidade">Cidade</string>
     <string name="cor">Cor</string>
+    <string name="de">de</string>
     <string name="editar">Editar</string>
     <string name="estado">Estado</string>
     <string name="excluir">Excluir</string>

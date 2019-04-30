@@ -6,15 +6,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".applications.App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher_01"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ListaObjetoActivity"></activity>
-        <activity android:name=".activities.TesteObjetoActivity"></activity>
-        <activity android:name=".activities.ObjetoActivity"></activity>
 
         <activity
             android:name=".activities.MainActivity"
@@ -25,23 +23,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.NovoObjetoActivity" />
         <activity
-            android:name=".activities.NovoPatrimonioActivity"
+            android:name=".activities.news.NovoPatrimonioActivity"
             android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".activities.NovaEmpresaActivity"
+            android:name=".activities.news.NovaEmpresaActivity"
             android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".activities.NovoEnderecoActivity"
+            android:name=".activities.news.NovoEnderecoActivity"
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="parentActivityName"
+                android:value="br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment" />
+        </activity>
+
+
+        <activity
+            android:name=".activities.edits.EditEnderecoActivity"
             android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".activities.EditEnderecoActivity"
+            android:name=".activities.news.NovoSetorActivity"
             android:parentActivityName=".activities.MainActivity" />
-        <activity
-            android:name=".activities.NovoSetorActivity"
-            android:parentActivityName=".activities.MainActivity" />
-        <activity android:name=".activities.EditPatrimonioActivity" />
+        <activity android:name=".activities.edits.EditPatrimonioActivity" />
     </application>
 
 </manifest>
