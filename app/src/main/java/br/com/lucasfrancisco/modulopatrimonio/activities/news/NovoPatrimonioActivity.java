@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,6 +70,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private RecyclerView rcyImagens;
     private FloatingActionButton fabNovaFoto, fabGaleria;
     private Toolbar tbrBottomMain;
+    private BottomNavigationView bnvBottom;
     private ProgressDialog progressDialog;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();

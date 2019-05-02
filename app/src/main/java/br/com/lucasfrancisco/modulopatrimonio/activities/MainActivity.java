@@ -12,15 +12,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovaEmpresaActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoObjetoActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
@@ -37,14 +45,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar tbrTopMain, tbrBottomMain;
     private NavigationView ngvMain;
 
+    // header_usuario
+    private ImageView imvPerfil;
+    private TextView tvNome, tvEmail;
+
     // Fragment
     private Fragment fragment = null;
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         // Buscar as empresas no Firestore e salva com SharedPreferencesEmpresa
         SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
@@ -58,12 +76,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         dwlMain = (DrawerLayout) findViewById(R.id.dwlMain);
 
+        // menu_drawer_main
         ngvMain = (NavigationView) findViewById(R.id.ngvMain);
         ngvMain.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, dwlMain, tbrTopMain, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         dwlMain.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+        // header_usuario
+        View headerUsuario = ngvMain.getHeaderView(0);
+        imvPerfil = (ImageView) headerUsuario.findViewById(R.id.imvPerfil);
+        tvNome = (TextView) headerUsuario.findViewById(R.id.tvNome);
+        tvEmail = (TextView) headerUsuario.findViewById(R.id.tvEmail);
+        setHeaderUsuario();
     }
 
     @Override
@@ -77,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
             return;
         } else {
-            backToast = Toast.makeText(getApplicationContext(), "Pressione novamente para sair!", Toast.LENGTH_SHORT);
+            backToast = Toast.makeText(getApplicationContext(), getString(R.string.pressione_novamente_para_sair), Toast.LENGTH_SHORT);
             backToast.show();
         }
         backPressedTime = System.currentTimeMillis();
@@ -91,34 +117,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        setFragment(null);
-
-        switch (menuItem.getItemId()) {
-            case R.id.itPatrimonio:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
-                setFragment(new PatrimonioFragment());
+          switch (menuItem.getItemId()) {
+            case R.id.itConfiguracoes:
                 break;
-            case R.id.itEmpresa:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EmpresaFragment()).commit();
-                setFragment(new EmpresaFragment());
+            case R.id.itPerfil:
                 break;
-            case R.id.itEndereco:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EnderecoFragment()).commit();
-                setFragment(new EnderecoFragment());
+            case R.id.itSair:
+                signOutGoogle();
                 break;
-            case R.id.itObjeto:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new ObjetoFragment()).commit();
-                setFragment(new ObjetoFragment());
-                break;
-            case R.id.itShare:
-                Toast.makeText(getApplicationContext(), "Compartilhar", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.itSend:
-                Toast.makeText(getApplicationContext(), "Enviar", Toast.LENGTH_SHORT).show();
+            case R.id.itCompartilhar:
                 break;
         }
         dwlMain.closeDrawer(GravityCompat.START);
@@ -167,30 +174,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tbrBottomMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                Intent intent = null;
-
                 switch (menuItem.getItemId()) {
                     case R.id.itPatrimonio:
-                        intent = new Intent(getApplicationContext(), NovoPatrimonioActivity.class);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
+                        setFragment(new PatrimonioFragment());
                         break;
                     case R.id.itEmpresa:
-                        intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EmpresaFragment()).commit();
+                        setFragment(new EmpresaFragment());
                         break;
                     case R.id.itEndereco:
-                        intent = new Intent(getApplicationContext(), NovoEnderecoActivity.class);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EnderecoFragment()).commit();
+                        setFragment(new EnderecoFragment());
                         break;
                     case R.id.itObjeto:
-                        intent = new Intent(getApplicationContext(), NovoObjetoActivity.class);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new ObjetoFragment()).commit();
+                        setFragment(new ObjetoFragment());
                         break;
                 }
-                startActivity(intent);
                 return true;
             }
         });
         tbrBottomMain.inflateMenu(R.menu.menu_toolbar_main);
     }
+
+    private void setHeaderUsuario() {
+        tvNome.setText(firebaseUser.getDisplayName());
+        tvEmail.setText(firebaseUser.getEmail());
+        Picasso.with(getApplicationContext()).load(firebaseUser.getPhotoUrl()).placeholder(R.drawable.ic_image).into(imvPerfil);
+    }
+
+    private void signOutGoogle() {
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
+        googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                finish();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
 }
-
-/*
-
- */

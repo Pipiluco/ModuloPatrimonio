@@ -8,6 +8,9 @@
     <string name="cidade">Cidade</string>
     <string name="cnpj">CNPJ</string>
     <string name="codigo">Código</string>
+    <string name="compartilhar">Compartilhar</string>
+    <string name="comunicacoes">Comunicações</string>
+    <string name="configuracoes">Configurações</string>
     <string name="cor">Cor</string>
 
     <string name="de">de</string>
@@ -16,6 +19,7 @@
     <string name="empresa">Empresa</string>
     <string name="empresas">Empresas</string>
     <string name="endereco">Endereço</string>
+    <string name="erro">Erro</string>
     <string name="estado">Estado</string>
     <string name="excluir">Excluir</string>
 
@@ -28,6 +32,7 @@
     <string name="galeria">Galeria</string>
 
     <string name="limite">Limite</string>
+    <string name="logando">Logando</string>
 
     <string name="marca">Marca</string>
     <string name="modelo">Modelo</string>
@@ -49,6 +54,7 @@
 
     <string name="rua">Rua</string>
 
+    <string name="sair">Sair</string>
     <string name="sala">Sala</string>
     <string name="salvando">Salvando</string>
     <string name="salvar">Salvar</string>
@@ -74,6 +80,7 @@
     <string name="endereco_ja_existe">Já existe endereço salvo com estas informações!</string>
     <string name="endereco_nao_encontrado">Endereço não encontrado!</string>
     <string name="endereco_salvo">Endereço salvo!</string>
+    <string name="erro_login">Erro de login!</string>
     <string name="escolha_empresa">Escolha uma empresa</string>
     <string name="escolha_endereco">Escolha um endereço</string>
     <string name="escolha_filtro">Escolha um filtro</string>
@@ -99,6 +106,7 @@
     <string name="patrimonio_nao_encontrado">Patrimônio não encontrado!</string>
     <string name="patrimonio_salvo">Patrimônio salvo!</string>
     <string name="por_favor_aguarde">Por favor, aguarde!</string>
+    <string name="pressione_novamente_para_sair">Pressione novamente para sair!</string>
 
     <string name="objeto_ja_existe">Já existe objeto salvo com estes dados!</string>
     <string name="objeto_salvo">Objeto salvo!</string>

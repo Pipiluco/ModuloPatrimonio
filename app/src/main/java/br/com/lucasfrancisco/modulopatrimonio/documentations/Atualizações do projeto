@@ -7,15 +7,18 @@ Feito
     Melhorado a performace do RecyclerView NovoPatrimonioActivity com a biblioteca Picasso
     Implementado a exclusão de patrimônio e suas imagens
     Implementado Tipos utilisando Spinner
+    Implementado login com Google
 
 
 Fazer
     Implementar a adicação de objetos em (Fragments)
     Implementar salvar patrimônio em segundo plano
     Implementar notificação para salvar e atualizar patrimônio
+    Implementar adição de usuario na criação de qualquer conteúdo
+
+    Continuar NovoPatrimonioActivity bnvBottom
 
 
-    Continuar em tbrBottomMain br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity
 
 
 

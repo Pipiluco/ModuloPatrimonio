@@ -5,37 +5,27 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/itPatrimonio"
-            android:icon="@drawable/ic_items_01"
-            android:title="@string/patrimonio" />
-
-        <item
-            android:id="@+id/itEmpresa"
-            android:icon="@drawable/ic_empresa_01"
-            android:title="@string/empresa" />
-
-        <item
-            android:id="@+id/itEndereco"
+            android:id="@+id/itConfiguracoes"
             android:icon="@drawable/ic_address_01"
-            android:title="@string/endereco" />
+            android:title="@string/configuracoes" />
 
         <item
-            android:id="@+id/itObjeto"
-            android:icon="@drawable/ic_add"
-            android:title="@string/objeto" />
+            android:id="@+id/itPerfil"
+            android:icon="@drawable/ic_users_01"
+            android:title="@string/perfil" />
+
+        <item
+            android:id="@+id/itSair"
+            android:icon="@drawable/ic_exit"
+            android:title="@string/sair" />
     </group>
 
-    <item android:title="Comunicação">
+    <item android:title="@string/comunicacoes">
         <menu>
             <item
-                android:id="@+id/itShare"
-                android:icon="@drawable/ic_add"
-                android:title="Compartilhar" />
-
-            <item
-                android:id="@+id/itSend"
-                android:icon="@drawable/ic_add"
-                android:title="Enviar" />
+                android:id="@+id/itCompartilhar"
+                android:icon="@drawable/ic_share"
+                android:title="@string/compartilhar" />
         </menu>
     </item>
 </menu>

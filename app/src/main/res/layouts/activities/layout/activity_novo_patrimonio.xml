@@ -9,7 +9,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/incTbrBottom">
+        android:layout_above="@+id/bnvBottom">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -71,7 +71,7 @@
         android:id="@+id/famNovaImagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/incTbrBottom"
+        android:layout_above="@+id/bnvBottom"
         android:layout_alignParentEnd="false"
         android:layout_alignParentRight="true"
         app:menu_backgroundColor="@android:color/transparent"
@@ -97,85 +97,19 @@
             app:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 
-    <include
-        android:id="@+id/incTbrBottom"
-        layout="@layout/toolbar_bottom_main" />
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bnvBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:itemTextColor="@color/colorPrimary"
+        app:menu="@menu/menu_toolbar_main" />
 
 </RelativeLayout>
 
     <!--
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/incTbrBottom">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_linear_layout">
-
-                <Spinner
-                    android:id="@+id/spnEmpresa"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/escolha_empresa"
-                    android:spinnerMode="dialog" />
-
-                <Spinner
-                    android:id="@+id/spnSetor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/spnEmpresa"
-                    android:prompt="@string/escolha_setor"
-                    android:spinnerMode="dialog" />
-
-                <EditText
-                    android:id="@+id/edtPlaqueta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/spnSetor"
-                    android:ems="10"
-                    android:hint="@string/plaqueta"
-                    android:inputType="number"
-                    android:text="" />
-
-                <EditText
-                    android:id="@+id/edtTipo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/edtPlaqueta"
-                    android:ems="10"
-                    android:hint="@string/tipo"
-                    android:inputType="textPersonName"
-                    android:text="" />
-
-                <EditText
-                    android:id="@+id/edtMarca"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/edtTipo"
-                    android:ems="10"
-                    android:hint="@string/marca"
-                    android:inputType="textPersonName"
-                    android:text="" />
-
-                <EditText
-                    android:id="@+id/edtModelo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/edtMarca"
-                    android:ems="10"
-                    android:hint="@string/modelo"
-                    android:inputType="textPersonName"
-                    android:text="" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rcyImagens"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@+id/edtModelo"
-                    android:layout_centerHorizontal="true" />
-            </RelativeLayout>
-        </ScrollView>
-
+  <include
+        android:id="@+id/incTbrBottom"
+        layout="@layout/toolbar_bottom_main" />
     -->
