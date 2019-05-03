@@ -3,11 +3,32 @@ package br.com.lucasfrancisco.modulopatrimonio.models;
 import java.io.Serializable;
 
 public class Usuario implements Serializable {
+    private String id;
     private String nome;
-    private String sobrenome;
+    private String email;
+    private String urlFoto;
     private String cargo;
     private String CPF;
-    private int idade;
+
+    public Usuario() {
+    }
+
+    public Usuario(String id, String nome, String email, String urlFoto, String cargo, String CPF) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.urlFoto = urlFoto;
+        this.cargo = cargo;
+        this.CPF = CPF;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;
@@ -17,12 +38,20 @@ public class Usuario implements Serializable {
         this.nome = nome;
     }
 
-    public String getSobrenome() {
-        return sobrenome;
+    public String getEmail() {
+        return email;
     }
 
-    public void setSobrenome(String sobrenome) {
-        this.sobrenome = sobrenome;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
     }
 
     public String getCargo() {
@@ -39,13 +68,5 @@ public class Usuario implements Serializable {
 
     public void setCPF(String CPF) {
         this.CPF = CPF;
-    }
-
-    public int getIdade() {
-        return idade;
-    }
-
-    public void setIdade(int idade) {
-        this.idade = idade;
     }
 }

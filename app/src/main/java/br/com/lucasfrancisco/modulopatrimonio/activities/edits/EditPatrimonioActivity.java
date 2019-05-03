@@ -50,6 +50,7 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
 public class EditPatrimonioActivity extends AppCompatActivity {
     private static final int REQUEST_LOAD_IMAGE = 1;
@@ -64,7 +65,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
     private boolean isEdit = false;
 
     private ArrayAdapter adapter;
-    private List<Patrimonio> patrimonios;
     private Patrimonio patrimonio;
     private List<Imagem> imagens;
     private EditImagemAdapter imagemAdapter;
@@ -185,6 +185,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         final Setor setor = (Setor) spnSetor.getSelectedItem();
         final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
         final String plaqueta = edtPlaqueta.getText().toString();
+        final Usuario criador = patrimonio.getCriador();
 
         final boolean isAtivo = true;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
@@ -209,7 +210,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
                             if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
                                 collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                                patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+                                patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
                                 collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                             }
                         }
@@ -222,14 +223,14 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                 } else {
                     if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
                         collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                        patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+                        patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
                         collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     }
                 }
             }
         } else { // Salva patrimônio sem imagem
             collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-            patrimonio = new Patrimonio(plaqueta, isAtivo, setor, objeto, imagens);
+            patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
             collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
         }
     }
@@ -429,29 +430,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                 atualizar();
             }
         }).attachToRecyclerView(rcyImagens);
-    }
-
-    public void getListPatrimonios() {
-        final List<Patrimonio> list = new ArrayList<>();
-        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-
-        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    collectionReference.document(documentSnapshot.getId()).collection("Patrimonios").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
-                                Patrimonio patrimonio = snapshot.toObject(Patrimonio.class);
-                                list.add(patrimonio);
-                            }
-                            patrimonios = list;
-                        }
-                    });
-                }
-            }
-        });
     }
 
     private void requestLoadImage(Intent data) {

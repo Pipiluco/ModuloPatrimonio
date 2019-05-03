@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Patrimonio implements Serializable {
+    private Usuario criador;
     private String plaqueta;
     private boolean isAtivo;
     private Setor setor;
@@ -13,7 +14,8 @@ public class Patrimonio implements Serializable {
     public Patrimonio() {
     }
 
-    public Patrimonio(String plaqueta, boolean isAtivo, Setor setor, Objeto objeto, List<Imagem> imagens) {
+    public Patrimonio(Usuario criador, String plaqueta, boolean isAtivo, Setor setor, Objeto objeto, List<Imagem> imagens) {
+        this.criador = criador;
         this.plaqueta = plaqueta;
         this.isAtivo = isAtivo;
         this.setor = setor;
@@ -21,6 +23,14 @@ public class Patrimonio implements Serializable {
         this.imagens = imagens;
     }
 
+
+    public Usuario getCriador() {
+        return criador;
+    }
+
+    public void setCriador(Usuario criador) {
+        this.criador = criador;
+    }
 
     public String getPlaqueta() {
         return plaqueta;

@@ -18,8 +18,8 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +36,8 @@ import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -48,6 +50,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,8 +61,9 @@ import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
 import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
-public class NovoPatrimonioActivity extends AppCompatActivity {
+public class NovoPatrimonioActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private static final int REQUEST_LOAD_IMAGE = 1;
     private static final int REQUEST_SCAN_CODE = 101;
     private static final int REQUEST_CAMERA_CODE = 3;
@@ -69,18 +73,20 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
     private ImageButton imbScanner;
     private RecyclerView rcyImagens;
     private FloatingActionButton fabNovaFoto, fabGaleria;
-    private Toolbar tbrBottomMain;
     private BottomNavigationView bnvBottom;
     private ProgressDialog progressDialog;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     private ArrayAdapter adapter;
     private ImagemAdapter imagemAdapter;
     private ArrayList<String> listEmpresas;
     private ArrayList<String> listPatrimonios;
     private List<Imagem> imagens;
+    private int contador = 0;
 
     private Activity activity = this;
     private Uri uriImagemCamera;
@@ -98,6 +104,9 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_patrimonio));
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
         spnSetor = (Spinner) findViewById(R.id.spnSetor);
         spnObjeto = (Spinner) findViewById(R.id.spnObjeto);
@@ -106,7 +115,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         rcyImagens = (RecyclerView) findViewById(R.id.rcyImagens);
         fabNovaFoto = (FloatingActionButton) findViewById(R.id.fabNovaFoto);
         fabGaleria = (FloatingActionButton) findViewById(R.id.fabGaleria);
-        tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
+        bnvBottom = (BottomNavigationView) findViewById(R.id.bnvBottom);
 
         progressDialog = new ProgressDialog(this);
         imagens = new ArrayList<>();
@@ -120,12 +129,14 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         rcyImagens.setAdapter(imagemAdapter);
         imagemAdapter.notifyDataSetChanged();
 
+        // Listener
+        bnvBottom.setOnNavigationItemSelectedListener(this);
+
         getPermissoes();
         getSpinnerEmpresas();
         getSpinnerObjetos();
         getFabNovaFoto();
         getFabGaleria();
-        getTbrBottomMain();
         getItemTouch();
         getClickRecyclerView();
         getImbScanner();
@@ -174,7 +185,98 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         }
     }
 
+    // Toolbar inferior
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Intent intent = null;
+
+        switch (menuItem.getItemId()) {
+            case R.id.itPatrimonio:
+                intent = new Intent(getApplicationContext(), NovoPatrimonioActivity.class);
+                break;
+            case R.id.itEmpresa:
+                intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
+                break;
+            case R.id.itEndereco:
+                intent = new Intent(getApplicationContext(), NovoEnderecoActivity.class);
+                break;
+            case R.id.itObjeto:
+                intent = new Intent(getApplicationContext(), NovoObjetoActivity.class);
+                break;
+        }
+        startActivity(intent);
+        return true;
+    }
+
     // Salva patrimônio
+    public void salvar3() { // Estável OK
+        getListPatrimonios();
+
+        if (spnEmpresa.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (spnSetor.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final Setor setor = (Setor) spnSetor.getSelectedItem();
+        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
+        final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
+        final String plaqueta = edtPlaqueta.getText().toString();
+        Boolean isPatrimonio = false;
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+
+        // Verifica se o patrimônio já existe no banco
+        for (int i = 0; i < listPatrimonios.size(); i++) {
+            if (plaqueta.equals(listPatrimonios.get(i))) {
+                isPatrimonio = true;
+                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!isPatrimonio) {
+            if (plaqueta.trim().isEmpty()) {
+                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
+                progressDialog.setMessage(getString(R.string.por_favor_aguarde));
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
+                //////////////
+                for (int i = 0; i < imagens.size(); i++) {
+                    Uri uri = Uri.parse(imagens.get(i).getUrlLocal());
+                    StorageReference pasta = FirebaseStorage.getInstance().getReference().child("Files");
+                    final StorageReference nomeArquivo = pasta.child("file" + uri.getLastPathSegment());
+
+                    nomeArquivo.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            nomeArquivo.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    CollectionReference collection = firebaseFirestore.collection("Teste");
+                                    HashMap<String, String> hashMap = new HashMap<>();
+                                    hashMap.put("link", String.valueOf(uri));
+                                    collection.document().set(hashMap);
+                                    progressDialog.dismiss();
+                                    imagens.clear();
+                                }
+                            });
+                        }
+                    });
+                }
+
+                /////////////
+            }
+        }
+    }
+
+    // Salva patrimônio ///////////////////////////////////////////////////////////////////////////
     public void salvar() { // Estável OK
         storageReference = FirebaseStorage.getInstance().getReference();
         getListPatrimonios();
@@ -191,6 +293,104 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
 
         final Setor setor = (Setor) spnSetor.getSelectedItem();
         final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
+        final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
+        final String plaqueta = edtPlaqueta.getText().toString();
+        final List<Imagem> img = imagens;
+        Boolean isPatrimonio = false;
+        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+
+        // Verifica se o patrimônio já existe no banco
+        for (int i = 0; i < listPatrimonios.size(); i++) {
+            if (plaqueta.equals(listPatrimonios.get(i))) {
+                isPatrimonio = true;
+                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!isPatrimonio) {
+            if (plaqueta.trim().isEmpty()) {
+                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
+                progressDialog.setMessage(getString(R.string.por_favor_aguarde));
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
+                if (imagens.size() > 0) { // Salva patrimônio com imagem
+                    final List<Imagem> imagemAux = new ArrayList<>();
+                    final Imagem imagem = new Imagem();
+
+                    for (int i = 0; i < imagens.size(); i++) {
+                        final String nome = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
+                        final String urlLocal = imagens.get(i).getUrlLocal();
+
+                        StorageReference pastaReference = FirebaseStorage.getInstance().getReference().child("Imagens/Patrimonios/" + plaqueta);
+                        final StorageReference arquivoReference = pastaReference.child(nome);
+
+                        final int finalI = i;
+                        arquivoReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                arquivoReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        imagem.setNome(nome);
+                                        imagem.setUrlLocal(urlLocal);
+                                        imagem.setUrlRemota(String.valueOf(uri));
+                                        imagem.setEnviada(true);
+                                        imagemAux.add(imagem);
+
+                                        contador = contador + 1;
+
+                                        if (imagens.size() == contador) {
+                                            Log.d("IMGUP", "Carregando " + finalI + " cont: " + contador);
+                                            Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagemAux); // imagens
+
+                                            collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    progressDialog.cancel();
+                                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                                                    getListPatrimonios();
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                } else { // Salva patrimônio sem imagem
+                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
+                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
+                    cleanForm();
+                    progressDialog.cancel();
+                    getListPatrimonios();
+                }
+            }
+        }
+    }
+
+    // Salva patrimônio
+    public void salvar2() { // Estável OK
+        storageReference = FirebaseStorage.getInstance().getReference();
+        getListPatrimonios();
+
+        if (spnEmpresa.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (spnSetor.getSelectedItem() == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final Setor setor = (Setor) spnSetor.getSelectedItem();
+        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
+        final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
         final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
         final String plaqueta = edtPlaqueta.getText().toString();
         Boolean isPatrimonio = false;
@@ -232,7 +432,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                                 imagemAdapter.notifyDataSetChanged();
 
                                 if (finalI == imagens.size() - 1) {
-                                    Patrimonio patrimonio = new Patrimonio(plaqueta, true, setor, objeto, imagens); // imagens
+                                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
                                     collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                                     cleanForm();
@@ -254,7 +454,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
                         });
                     }
                 } else { // Salva patrimônio sem imagem
-                    Patrimonio patrimonio = new Patrimonio(plaqueta, true, setor, objeto, imagens); // imagens
+                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
                     collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                     cleanForm();
@@ -506,31 +706,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
         });
     }
 
-    // Toolbar inferior
-    public void getTbrBottomMain() {
-        tbrBottomMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Intent intent = null;
-
-                switch (menuItem.getItemId()) {
-                    case R.id.itPatrimonio:
-                        intent = new Intent(getApplicationContext(), NovoPatrimonioActivity.class);
-                        break;
-                    case R.id.itEmpresa:
-                        intent = new Intent(getApplicationContext(), NovaEmpresaActivity.class);
-                        break;
-                    case R.id.itEndereco:
-                        intent = new Intent(getApplicationContext(), NovoEnderecoActivity.class);
-                        break;
-                }
-                startActivity(intent);
-                return true;
-            }
-        });
-        tbrBottomMain.inflateMenu(R.menu.menu_toolbar_main);
-    }
-
     // Retorna o nome de um arquivo selecionado no gerenciador de arquivos
     public String getNomeArquivo(Uri uri) {
         String resultado = null;
@@ -577,4 +752,5 @@ public class NovoPatrimonioActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
         }
     }
+
 }

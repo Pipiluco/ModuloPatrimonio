@@ -16,7 +16,7 @@ Fazer
     Implementar notificação para salvar e atualizar patrimônio
     Implementar adição de usuario na criação de qualquer conteúdo
 
-    Continuar NovoPatrimonioActivity bnvBottom
+    Continuar NovoPatrimonioActivity salvar()
 
 
 

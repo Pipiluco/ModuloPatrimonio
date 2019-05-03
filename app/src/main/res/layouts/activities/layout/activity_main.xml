@@ -31,12 +31,18 @@
             android:id="@+id/fmlConteudo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/incTbrBottom"
+            android:layout_above="@+id/bnvBottom"
             android:layout_below="@+id/tbrTopMain" />
 
-        <include
-            android:id="@+id/incTbrBottom"
-            layout="@layout/toolbar_bottom_main" />
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bnvBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            app:itemIconTint="@color/cardview_light_background"
+            app:itemTextColor="@color/cardview_light_background"
+            app:menu="@menu/menu_toolbar_main" />
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView

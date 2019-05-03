@@ -3,6 +3,7 @@ package br.com.lucasfrancisco.modulopatrimonio.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -37,12 +38,13 @@ import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment {
     private long backPressedTime;
     private Toast backToast;
 
     private DrawerLayout dwlMain;
-    private Toolbar tbrTopMain, tbrBottomMain;
+    private Toolbar tbrTopMain;
+    private BottomNavigationView bnvBottom;
     private NavigationView ngvMain;
 
     // header_usuario
@@ -68,21 +70,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferencesEmpresa sharedPreferencesEmpresa = new SharedPreferencesEmpresa();
         sharedPreferencesEmpresa.inserir(getApplicationContext());
 
-        tbrBottomMain = (Toolbar) findViewById(R.id.incTbrBottom);
-        getTbrBottomMain();
-
+        // Tool bar superior
         tbrTopMain = (Toolbar) findViewById(R.id.tbrTopMain);
         setSupportActionBar(tbrTopMain);
 
+        // Tool bar inferior
+        bnvBottom = (BottomNavigationView) findViewById(R.id.bnvBottom);
+        getBnvBottom();
+
         dwlMain = (DrawerLayout) findViewById(R.id.dwlMain);
 
-        // menu_drawer_main
+        // NavigationView
         ngvMain = (NavigationView) findViewById(R.id.ngvMain);
         ngvMain.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, dwlMain, tbrTopMain, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         dwlMain.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+        // Fragment inicial
+        getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
+        setFragment(new PatrimonioFragment());
 
         // header_usuario
         View headerUsuario = ngvMain.getHeaderView(0);
@@ -117,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-          switch (menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.itConfiguracoes:
                 break;
             case R.id.itPerfil:
@@ -170,10 +179,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     // Toolbar inferior
-    public void getTbrBottomMain() {
-        tbrBottomMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+    public void getBnvBottom() {
+        bnvBottom.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.itPatrimonio:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
@@ -199,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
-        tbrBottomMain.inflateMenu(R.menu.menu_toolbar_main);
     }
 
     private void setHeaderUsuario() {
