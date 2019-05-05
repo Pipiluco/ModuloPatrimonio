@@ -19,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,9 +32,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -43,14 +40,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -77,7 +72,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
     private ProgressDialog progressDialog;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
 
@@ -208,77 +202,8 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
         return true;
     }
 
-    // Salva patrimônio
-    public void salvar3() { // Estável OK
-        getListPatrimonios();
-
-        if (spnEmpresa.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (spnSetor.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        final Setor setor = (Setor) spnSetor.getSelectedItem();
-        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
-        final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
-        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
-        final String plaqueta = edtPlaqueta.getText().toString();
-        Boolean isPatrimonio = false;
-        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-
-        // Verifica se o patrimônio já existe no banco
-        for (int i = 0; i < listPatrimonios.size(); i++) {
-            if (plaqueta.equals(listPatrimonios.get(i))) {
-                isPatrimonio = true;
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        if (!isPatrimonio) {
-            if (plaqueta.trim().isEmpty()) {
-                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-            } else {
-                progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
-                progressDialog.setMessage(getString(R.string.por_favor_aguarde));
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-
-                //////////////
-                for (int i = 0; i < imagens.size(); i++) {
-                    Uri uri = Uri.parse(imagens.get(i).getUrlLocal());
-                    StorageReference pasta = FirebaseStorage.getInstance().getReference().child("Files");
-                    final StorageReference nomeArquivo = pasta.child("file" + uri.getLastPathSegment());
-
-                    nomeArquivo.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            nomeArquivo.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    CollectionReference collection = firebaseFirestore.collection("Teste");
-                                    HashMap<String, String> hashMap = new HashMap<>();
-                                    hashMap.put("link", String.valueOf(uri));
-                                    collection.document().set(hashMap);
-                                    progressDialog.dismiss();
-                                    imagens.clear();
-                                }
-                            });
-                        }
-                    });
-                }
-
-                /////////////
-            }
-        }
-    }
-
     // Salva patrimônio ///////////////////////////////////////////////////////////////////////////
     public void salvar() { // Estável OK
-        storageReference = FirebaseStorage.getInstance().getReference();
         getListPatrimonios();
 
         if (spnEmpresa.getSelectedItem() == null) {
@@ -296,8 +221,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
         final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
         final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
         final String plaqueta = edtPlaqueta.getText().toString();
-        final List<Imagem> img = imagens;
-        Boolean isPatrimonio = false;
+        boolean isPatrimonio = false;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
         // Verifica se o patrimônio já existe no banco
@@ -308,6 +232,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
             }
         }
 
+        // Se o patrimônio não existe ele pode ser criado
         if (!isPatrimonio) {
             if (plaqueta.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
@@ -318,39 +243,31 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
                 progressDialog.show();
 
                 if (imagens.size() > 0) { // Salva patrimônio com imagem
-                    final List<Imagem> imagemAux = new ArrayList<>();
-                    final Imagem imagem = new Imagem();
-
                     for (int i = 0; i < imagens.size(); i++) {
                         final String nome = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                        final String urlLocal = imagens.get(i).getUrlLocal();
+                        final StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Imagens/Patrimonios/" + plaqueta).child(nome);
 
-                        StorageReference pastaReference = FirebaseStorage.getInstance().getReference().child("Imagens/Patrimonios/" + plaqueta);
-                        final StorageReference arquivoReference = pastaReference.child(nome);
-
-                        final int finalI = i;
-                        arquivoReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        storageReference.putFile(Uri.parse(imagens.get(i).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() { // Envia o arquivo
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                arquivoReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() { // Recupera a url do arquivo já envido
                                     @Override
                                     public void onSuccess(Uri uri) {
-                                        imagem.setNome(nome);
-                                        imagem.setUrlLocal(urlLocal);
-                                        imagem.setUrlRemota(String.valueOf(uri));
-                                        imagem.setEnviada(true);
-                                        imagemAux.add(imagem);
+                                        imagens.get(contador).setEnviada(true);
+                                        imagens.get(contador).setNome(nome);
+                                        imagens.get(contador).setUrlRemota(String.valueOf(uri));
+                                        imagemAdapter.notifyDataSetChanged();
 
                                         contador = contador + 1;
 
                                         if (imagens.size() == contador) {
-                                            Log.d("IMGUP", "Carregando " + finalI + " cont: " + contador);
-                                            Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagemAux); // imagens
+                                            Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens);
 
                                             collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     progressDialog.cancel();
+                                                    cleanForm();
                                                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                                                     getListPatrimonios();
                                                 }
@@ -358,98 +275,6 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
                                         }
                                     }
                                 });
-                            }
-                        });
-                    }
-                } else { // Salva patrimônio sem imagem
-                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
-                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
-                    cleanForm();
-                    progressDialog.cancel();
-                    getListPatrimonios();
-                }
-            }
-        }
-    }
-
-    // Salva patrimônio
-    public void salvar2() { // Estável OK
-        storageReference = FirebaseStorage.getInstance().getReference();
-        getListPatrimonios();
-
-        if (spnEmpresa.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_empresa), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (spnSetor.getSelectedItem() == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.necessario_setor), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        final Setor setor = (Setor) spnSetor.getSelectedItem();
-        final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
-        final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
-        final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
-        final String plaqueta = edtPlaqueta.getText().toString();
-        Boolean isPatrimonio = false;
-        final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
-
-        // Verifica se o patrimônio já existe no banco
-        for (int i = 0; i < listPatrimonios.size(); i++) {
-            if (plaqueta.equals(listPatrimonios.get(i))) {
-                isPatrimonio = true;
-                Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_ja_existe) + " (" + plaqueta + ")", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        if (!isPatrimonio) {
-            if (plaqueta.trim().isEmpty()) {
-                Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-            } else {
-                progressDialog.setTitle(getString(R.string.salvando) + " " + plaqueta);
-                progressDialog.setMessage(getString(R.string.por_favor_aguarde));
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-
-                if (imagens.size() > 0) { // Salva patrimônio com imagem
-                    for (int i = 0; i < imagens.size(); i++) {
-                        final String nomeArquivo = plaqueta + "_" + System.currentTimeMillis() + "." + getExtensaoArquivo(Uri.parse(imagens.get(i).getUrlLocal()));
-                        StorageReference uploadReference = storageReference.child("Imagens/Patrimonios/" + plaqueta).child(nomeArquivo);
-                        final int finalI = i;
-
-                        uploadReference.putFile(Uri.parse(imagens.get(finalI).getUrlLocal())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                progressDialog.setMessage(getString(R.string.salvando) + " " + finalI + " " + getString(R.string.de) + " " + imagens.size());
-                                imagens.get(finalI).setEnviada(true);
-                                imagens.get(finalI).setNome(nomeArquivo);
-
-                                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                while (!uriTask.isSuccessful()) ;
-                                imagens.get(finalI).setUrlRemota(uriTask.getResult().toString());
-                                imagemAdapter.notifyDataSetChanged();
-
-                                if (finalI == imagens.size() - 1) {
-                                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
-                                    collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
-                                    cleanForm();
-                                    progressDialog.cancel();
-                                    getListPatrimonios();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.cancel();
-                                Toast.makeText(getApplicationContext(), "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
                             }
                         });
                     }
@@ -734,6 +559,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
     // Limpa campos de texto e lista
     public void cleanForm() {
         edtPlaqueta.setText("");
+        contador = 0;
         imagens.clear();
         imagemAdapter.notifyDataSetChanged();
     }

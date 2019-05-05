@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -174,6 +175,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         spnSetor.setEnabled(false);
         spnObjeto.setEnabled(false);
         edtPlaqueta.setEnabled(false);
+        edtPlaqueta.setInputType(InputType.TYPE_NULL); // Desativa o teclado para o EditText
         famNovaImagem.setVisibility(View.INVISIBLE);
 
         return isEdit;
@@ -186,7 +188,6 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
         final String plaqueta = edtPlaqueta.getText().toString();
         final Usuario criador = patrimonio.getCriador();
-
         final boolean isAtivo = true;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 

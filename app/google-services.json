@@ -15,27 +15,19 @@
       },
       "oauth_client": [
         {
+          "client_id": "726475614180-36u3eg4c07kvi01v1nk1nrqr778cmrn4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.lucasfrancisco.modulopatrimonio",
+            "certificate_hash": "aa3faf2ec13cab6338596f88590b0b58f2051057"
+          }
+        },
+        {
           "client_id": "726475614180-md260ifl158a1u5l5l5iheti3pgasfuf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "br.com.lucasfrancisco.modulopatrimonio",
             "certificate_hash": "0cefe6624a9c75ea9af952d4671d09c052023fb1"
-          }
-        },
-        {
-          "client_id": "726475614180-j5sm38i22048r3q8br128nnq3lcg5o6a.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "br.com.lucasfrancisco.modulopatrimonio",
-            "certificate_hash": "82cb5633c261c1c75d44a4dd7f726b6f149e80db"
-          }
-        },
-        {
-          "client_id": "726475614180-bb19bgl5924uf5si0kip7cekr3s2eu8v.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "br.com.lucasfrancisco.modulopatrimonio",
-            "certificate_hash": "aa3faf2ec13cab6338596f88590b0b58f2051057"
           }
         },
         {

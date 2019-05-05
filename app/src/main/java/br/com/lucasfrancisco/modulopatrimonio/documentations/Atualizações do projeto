@@ -7,7 +7,10 @@ Feito
     Melhorado a performace do RecyclerView NovoPatrimonioActivity com a biblioteca Picasso
     Implementado a exclusão de patrimônio e suas imagens
     Implementado Tipos utilisando Spinner
-    Implementado login com Google
+    02-05-2019 Implementado login com Google
+    03-05-2019 Implementado a adição de usuário na criação de patrimônio
+    05-05-2019 Correção de bugs na adição de imagens no Firebase
+
 
 
 Fazer
@@ -15,8 +18,8 @@ Fazer
     Implementar salvar patrimônio em segundo plano
     Implementar notificação para salvar e atualizar patrimônio
     Implementar adição de usuario na criação de qualquer conteúdo
+    Implementar nível de parmissão para usuários
 
-    Continuar NovoPatrimonioActivity salvar()
 
 
 
