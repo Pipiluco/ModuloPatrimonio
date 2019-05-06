@@ -1,8 +1,9 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Empresa implements Serializable {
+public class Empresa extends Rastreamento implements Serializable {
     private String nome;
     private String fantasia;
     private String codigo;
@@ -12,14 +13,8 @@ public class Empresa implements Serializable {
     public Empresa() {
     }
 
-    public Empresa(String nome, String fantasia, String codigo, String CNPJ) {
-        this.nome = nome;
-        this.fantasia = fantasia;
-        this.codigo = codigo;
-        this.CNPJ = CNPJ;
-    }
-
-    public Empresa(String nome, String fantasia, String codigo, String CNPJ, Endereco endereco) {
+    public Empresa(Usuario criador, Usuario editor, Date dataCriacao, Date dataEdicao, String nome, String fantasia, String codigo, String CNPJ, Endereco endereco) {
+        super(criador, editor, dataCriacao, dataEdicao);
         this.nome = nome;
         this.fantasia = fantasia;
         this.codigo = codigo;

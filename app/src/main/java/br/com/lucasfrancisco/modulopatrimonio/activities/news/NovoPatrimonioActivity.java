@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -46,6 +47,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -221,6 +223,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
         final Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
         final String nomeEmpresa = spnEmpresa.getSelectedItem().toString();
         final String plaqueta = edtPlaqueta.getText().toString();
+        final Date dataCriacao = Timestamp.now().toDate();
         boolean isPatrimonio = false;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
@@ -261,7 +264,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
                                         contador = contador + 1;
 
                                         if (imagens.size() == contador) {
-                                            Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens);
+                                            Patrimonio patrimonio = new Patrimonio(criador, null, dataCriacao, null, plaqueta, true, setor, objeto, imagens);
 
                                             collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -279,7 +282,7 @@ public class NovoPatrimonioActivity extends AppCompatActivity implements BottomN
                         });
                     }
                 } else { // Salva patrimônio sem imagem
-                    Patrimonio patrimonio = new Patrimonio(criador, plaqueta, true, setor, objeto, imagens); // imagens
+                    Patrimonio patrimonio = new Patrimonio(criador, null, dataCriacao, null, plaqueta, true, setor, objeto, imagens); // imagens
                     collectionReference.document(nomeEmpresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     Toast.makeText(getApplicationContext(), getString(R.string.patrimonio_salvo), Toast.LENGTH_SHORT).show();
                     cleanForm();

@@ -1,8 +1,9 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Setor implements Serializable {
+public class Setor extends Rastreamento implements Serializable {
     private String bloco;
     private String tipo;
     private String sala;
@@ -11,15 +12,10 @@ public class Setor implements Serializable {
     public Setor() {
     }
 
-    public Setor(String bloco, String nome, String sala) {
+    public Setor(Usuario criador, Usuario editor, Date dataCriacao, Date dataEdicao, String bloco, String tipo, String sala, Empresa empresa) {
+        super(criador, editor, dataCriacao, dataEdicao);
         this.bloco = bloco;
-        this.tipo = nome;
-        this.sala = sala;
-    }
-
-    public Setor(String bloco, String nome, String sala, Empresa empresa) {
-        this.bloco = bloco;
-        this.tipo = nome;
+        this.tipo = tipo;
         this.sala = sala;
         this.empresa = empresa;
     }

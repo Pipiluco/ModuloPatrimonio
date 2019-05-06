@@ -1,8 +1,9 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Objeto implements Serializable {
+public class Objeto extends Rastreamento implements Serializable {
     private String tipo;
     private String marca;
     private String modelo;
@@ -11,12 +12,12 @@ public class Objeto implements Serializable {
     public Objeto() {
     }
 
-    public Objeto(String tipo, String marca, String modelo) {
+    public Objeto(Usuario criador, Usuario editor, Date dataCriacao, Date dataEdicao, String tipo, String marca, String modelo) {
+        super(criador, editor, dataCriacao, dataEdicao);
         this.tipo = tipo;
         this.marca = marca;
         this.modelo = modelo;
     }
-
 
     public String getTipo() {
         return tipo;

@@ -11,21 +11,28 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
 public class NovoEnderecoActivity extends AppCompatActivity {
     private EditText edtRua, edtNumero, edtCEP, edtBairro, edtCidade, edtEstado, edtPais;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     private ArrayList<String> listEnderecos;
 
@@ -38,6 +45,9 @@ public class NovoEnderecoActivity extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_endereco));
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         edtRua = (EditText) findViewById(R.id.edtRua);
         edtNumero = (EditText) findViewById(R.id.edtNumero);
@@ -75,6 +85,8 @@ public class NovoEnderecoActivity extends AppCompatActivity {
         String estado = edtEstado.getText().toString();
         String pais = edtPais.getText().toString();
         String documento = cep + " - " + rua + " - " + numero;
+        Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        Date dataCriacao = Timestamp.now().toDate();
         Boolean isEndereco = false;
         CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
         Endereco endereco;
@@ -93,7 +105,7 @@ public class NovoEnderecoActivity extends AppCompatActivity {
                 if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
                     Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
                 } else {
-                    endereco = new Endereco(rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                    endereco = new Endereco(criador, null, dataCriacao, null, rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
                     collectionReference.document(documento).set(endereco);
                     Toast.makeText(getApplicationContext(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
                     getListEnderecos();
@@ -105,7 +117,7 @@ public class NovoEnderecoActivity extends AppCompatActivity {
             if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                endereco = new Endereco(rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                endereco = new Endereco(criador, null, dataCriacao, null, rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
                 collectionReference.document(documento).set(endereco);
                 Toast.makeText(getApplicationContext(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
                 getListEnderecos();

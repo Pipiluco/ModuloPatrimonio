@@ -15,18 +15,23 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
 public class NovaEmpresaActivity extends AppCompatActivity {
     private EditText edtNome, edtFantasia, edtCodigo, edtCNPJ;
@@ -34,6 +39,8 @@ public class NovaEmpresaActivity extends AppCompatActivity {
     private FloatingActionButton fabNovoEndereco;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     private ArrayAdapter adapter;
     private ArrayList<String> listEmpresas;
@@ -48,6 +55,9 @@ public class NovaEmpresaActivity extends AppCompatActivity {
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.nova_empresa));
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         edtNome = (EditText) findViewById(R.id.edtNome);
         edtFantasia = (EditText) findViewById(R.id.edtFantasia);
@@ -86,6 +96,8 @@ public class NovaEmpresaActivity extends AppCompatActivity {
         String cnpj = edtCNPJ.getText().toString();
         String cidade = endereco.getCidade();
         Boolean isEmpresa = false;
+        Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        Date dataCriacao = Timestamp.now().toDate();
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
         Empresa empresa;
 
@@ -100,7 +112,7 @@ public class NovaEmpresaActivity extends AppCompatActivity {
             if (nome.trim().isEmpty() || fantasia.trim().isEmpty() || codigo.trim().isEmpty() || cnpj.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                empresa = new Empresa(nome, fantasia, codigo, cnpj, endereco);
+                empresa = new Empresa(criador, null, dataCriacao, null, nome, fantasia, codigo, cnpj, endereco);
                 collectionReference.document(codigo + " - " + fantasia + " " + cidade).collection("Sobre").document(codigo + " - " + fantasia + " " + cidade).set(empresa);
                 // Seta dados do documento para ativá-lo e facilitar nas buscas
                 Map<String, Object> map = new HashMap<>();

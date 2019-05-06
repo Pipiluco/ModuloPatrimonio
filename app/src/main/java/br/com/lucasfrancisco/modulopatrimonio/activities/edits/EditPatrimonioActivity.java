@@ -31,6 +31,9 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,6 +44,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,6 +76,8 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     private Uri uriImagemCamera;
 
@@ -88,6 +94,9 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         patrimonio = (Patrimonio) getIntent().getSerializableExtra("patrimonio");
 
         setTitle(patrimonio.getPlaqueta());
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
         spnSetor = (Spinner) findViewById(R.id.spnSetor);
@@ -188,6 +197,9 @@ public class EditPatrimonioActivity extends AppCompatActivity {
         final Objeto objeto = (Objeto) spnObjeto.getSelectedItem();
         final String plaqueta = edtPlaqueta.getText().toString();
         final Usuario criador = patrimonio.getCriador();
+        final Usuario editor = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        final Date dataCriacao = patrimonio.getDataCriacao();
+        final Date dataEdicao = Timestamp.now().toDate();
         final boolean isAtivo = true;
         final CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
 
@@ -211,7 +223,7 @@ public class EditPatrimonioActivity extends AppCompatActivity {
 
                             if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
                                 collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                                patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
+                                patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
                                 collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                             }
                         }
@@ -224,14 +236,14 @@ public class EditPatrimonioActivity extends AppCompatActivity {
                 } else {
                     if (finalI == imagens.size() - 1) { // Se a imagem é o último item da lista salva o patrimônio
                         collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-                        patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
+                        patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
                         collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
                     }
                 }
             }
         } else { // Salva patrimônio sem imagem
             collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
-            patrimonio = new Patrimonio(criador, plaqueta, isAtivo, setor, objeto, imagens);
+            patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
             collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
         }
     }

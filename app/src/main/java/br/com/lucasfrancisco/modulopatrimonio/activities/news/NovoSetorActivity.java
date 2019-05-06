@@ -16,16 +16,21 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Setor;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
 public class NovoSetorActivity extends AppCompatActivity {
     private Spinner spnEmpresa;
@@ -33,6 +38,8 @@ public class NovoSetorActivity extends AppCompatActivity {
     private FloatingActionButton fabNovaEmpresa;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     private ArrayAdapter adapter;
     private ArrayList<String> listSetores;
@@ -45,6 +52,9 @@ public class NovoSetorActivity extends AppCompatActivity {
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_setor));
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         spnEmpresa = (Spinner) findViewById(R.id.spnEmpresa);
         edtTipo = (EditText) findViewById(R.id.edtTipo);
@@ -86,6 +96,8 @@ public class NovoSetorActivity extends AppCompatActivity {
         String bloco = edtBloco.getText().toString();
         String sala = edtSala.getText().toString();
         Boolean isSetor = false;
+        Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        Date dataCriacao = Timestamp.now().toDate();
         CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
         Setor setor;
 
@@ -100,7 +112,7 @@ public class NovoSetorActivity extends AppCompatActivity {
             if (tipo.trim().isEmpty() || bloco.trim().isEmpty() || sala.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                setor = new Setor(bloco, tipo, sala, empresa);
+                setor = new Setor(criador, null, dataCriacao, null, bloco, tipo, sala, empresa);
                 collectionReference.document(nomeEmpresa).collection("Setores").document(bloco + " - " + sala).set(setor);
                 Toast.makeText(getApplicationContext(), getString(R.string.setor_salvo), Toast.LENGTH_SHORT).show();
                 getListSetores();

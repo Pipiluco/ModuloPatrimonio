@@ -1,8 +1,9 @@
 package br.com.lucasfrancisco.modulopatrimonio.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Endereco implements Serializable {
+public class Endereco extends Rastreamento implements Serializable {
     private String rua;
     private int numero;
     private String CEP;
@@ -14,7 +15,8 @@ public class Endereco implements Serializable {
     public Endereco() {
     }
 
-    public Endereco(String rua, int numero, String CEP, String bairro, String cidade, String estado, String pais) {
+    public Endereco(Usuario criador, Usuario editor, Date dataCriacao, Date dataEdicao, String rua, int numero, String CEP, String bairro, String cidade, String estado, String pais) {
+        super(criador, editor, dataCriacao, dataEdicao);
         this.rua = rua;
         this.numero = numero;
         this.CEP = CEP;

@@ -10,17 +10,22 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
+import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
 public class NovoObjetoActivity extends AppCompatActivity {
     private EditText edtTipo, edtMarca, edtModelo;
@@ -28,6 +33,8 @@ public class NovoObjetoActivity extends AppCompatActivity {
     private List<Objeto> objetos;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +45,9 @@ public class NovoObjetoActivity extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle(getString(R.string.novo_objeto));
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
         edtTipo = (EditText) findViewById(R.id.edtTipo);
         edtMarca = (EditText) findViewById(R.id.edtMarca);
@@ -68,6 +78,8 @@ public class NovoObjetoActivity extends AppCompatActivity {
         String modelo = edtModelo.getText().toString();
         String documento = tipo + " - " + marca + " " + modelo;
         boolean isObjeto = false;
+        Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        Date dataCriacao = Timestamp.now().toDate();
         CollectionReference collectionReference = firebaseFirestore.collection("Objetos");
         Objeto objeto;
 
@@ -84,7 +96,7 @@ public class NovoObjetoActivity extends AppCompatActivity {
                 if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                     Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
                 } else {
-                    objeto = new Objeto(tipo, marca, modelo);
+                    objeto = new Objeto(criador, null, dataCriacao, null, tipo, marca, modelo);
                     collectionReference.document(documento).set(objeto);
                     Toast.makeText(getApplicationContext(), getString(R.string.objeto_salvo), Toast.LENGTH_SHORT).show();
                     getListObjetos();
@@ -96,7 +108,7 @@ public class NovoObjetoActivity extends AppCompatActivity {
             if (tipo.trim().isEmpty() || marca.trim().isEmpty() || modelo.trim().isEmpty()) {
                 Toast.makeText(getApplicationContext(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
             } else {
-                objeto = new Objeto(tipo, marca, modelo);
+                objeto = new Objeto(criador, null, dataCriacao, null, tipo, marca, modelo);
                 collectionReference.document(documento).set(objeto);
                 Toast.makeText(getApplicationContext(), getString(R.string.objeto_salvo), Toast.LENGTH_SHORT).show();
                 getListObjetos();
