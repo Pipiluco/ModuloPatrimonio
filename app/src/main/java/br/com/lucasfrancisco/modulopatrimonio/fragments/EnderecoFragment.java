@@ -25,9 +25,10 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.edits.EditEnderecoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
@@ -142,9 +143,15 @@ public class EnderecoFragment extends Fragment {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Endereco endereco = documentSnapshot.toObject(Endereco.class);
-                Intent intent = new Intent(getActivity(), EditEnderecoActivity.class);
-                intent.putExtra("endereco", endereco);
-                startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("endereco", endereco);
+
+                Fragment fragment = new EditEnderecoFragment();
+                fragment.setArguments(bundle);
+
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, fragment).commit();
+                MainActivity.frag = fragment;
 
                 closeFloatingActionMenu();
             }
@@ -190,76 +197,3 @@ public class EnderecoFragment extends Fragment {
         return listFiltros;
     }
 }
-
-
-
-/*
-  // Teste com paginação
-    public void pesquisarTeste(String pesquisa, String filtro) {
-        Query query = collectionReference.orderBy("cep", Query.Direction.ASCENDING).limit(10);
-
-        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                final List<Endereco> enderecos = new ArrayList<>();
-                rcyEnderecos.setLayoutManager(new LinearLayoutManager(getActivity()));
-                rcyEnderecos.setHasFixedSize(true);
-
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Endereco endereco = documentSnapshot.toObject(Endereco.class);
-                    enderecos.add(endereco);
-                }
-                adapter = new br.com.lucasfrancisco.modulopatrimonio.testes.EnderecoAdapter(enderecos);
-                rcyEnderecos.setAdapter(adapter);
-
-                ultimoResultado = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
-                Toast.makeText(getActivity(), "First page", Toast.LENGTH_SHORT).show();
-
-                RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                            isSrolling = true;
-                        }
-                    }
-
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        LinearLayoutManager linearLayoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
-
-                        int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-                        int visibleItemCount = linearLayoutManager.getChildCount();
-                        int totalItemCount = linearLayoutManager.getItemCount();
-
-                        if (isSrolling && (firstVisibleItem + visibleItemCount == totalItemCount) && !isLastItem) {
-                            isSrolling = false;
-                            Query nextQuery = collectionReference.orderBy("cep", Query.Direction.ASCENDING).startAfter(ultimoResultado).limit(10);
-
-                            nextQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                @Override
-                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                        Endereco endereco = documentSnapshot.toObject(Endereco.class);
-                                        enderecos.add(endereco);
-                                    }
-                                    adapter.notifyDataSetChanged();
-
-                                    ultimoResultado = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
-                                    Toast.makeText(getActivity(), "Next page", Toast.LENGTH_SHORT).show();
-
-                                    if (queryDocumentSnapshots.size() < 10) {
-                                        isLastItem = true;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                };
-                rcyEnderecos.addOnScrollListener(onScrollListener);
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-  * */

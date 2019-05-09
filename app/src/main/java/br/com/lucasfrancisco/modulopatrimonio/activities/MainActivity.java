@@ -34,11 +34,17 @@ import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesE
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.EnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.ObjetoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.OpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFragment;
+import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment, CommunicateOpcoesMenuFragment {
+    public static Fragment frag = null;
+
     private long backPressedTime;
     private Toast backToast;
 
@@ -88,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dwlMain.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
 
-        // Fragment inicial
+        // Fragments iniciais
         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
         setFragment(new PatrimonioFragment());
@@ -101,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setHeaderUsuario();
     }
 
+    // Botão voltar
     @Override
     public void onBackPressed() {
         if (dwlMain.isDrawerOpen(GravityCompat.START)) {
@@ -118,12 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         backPressedTime = System.currentTimeMillis();
     }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
+    // Menu NavigationView
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
@@ -151,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.fragment = fragment;
     }
 
+    // Utilizado para pesquisas
     @Override
     public void onSetText(String texto, String filtro, long limite) {
         Fragment fragment = getFragment();
@@ -172,10 +175,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    // Utilizado para pesquisas
     @Override
     public void onSetFilter(ArrayList arrayList) { // Passa o ArrayList que veio dos fragments para o PesquisaFragment
         PesquisaFragment pesquisaFragment = (PesquisaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlPesquisa);
         pesquisaFragment.setFilter(arrayList);
+    }
+
+    // Utilizado para escolher o menu adequado para cada tipo de fragment fmlConteudo
+    @Override
+    public void onSetMenuItem(String opcao) {
+        if (frag instanceof EditEnderecoFragment) {
+            EditEnderecoFragment editEnderecoFragment = (EditEnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            editEnderecoFragment.setMenuItem(opcao);
+        } else if (frag instanceof EditPatrimonioFragment) {
+            EditPatrimonioFragment editPatrimonioFragment = (EditPatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            editPatrimonioFragment.setMenuItem(opcao);
+        } else {
+            Log.d("FRAGMENT", "Sem opção");
+        }
+    }
+
+    // Utilizado para setar o menu adequado para o fragment
+    @Override
+    public void onSetFragment(String fragment) {
+        OpcoesMenuFragment opcoesMenuFragment = (OpcoesMenuFragment) getSupportFragmentManager().findFragmentById(R.id.fmlPesquisa);
+        opcoesMenuFragment.setFragment(fragment);
     }
 
     // Toolbar inferior
@@ -210,12 +235,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    // Seta valores no header_usuario
     private void setHeaderUsuario() {
         tvNome.setText(firebaseUser.getDisplayName());
         tvEmail.setText(firebaseUser.getEmail());
         Picasso.with(getApplicationContext()).load(firebaseUser.getPhotoUrl()).placeholder(R.drawable.ic_image).into(imvPerfil);
     }
 
+    // Faz logof da conta Google
     private void signOutGoogle() {
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
@@ -229,4 +256,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+
 }

@@ -32,10 +32,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.edits.EditPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
@@ -233,12 +235,30 @@ public class PatrimonioFragment extends Fragment {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
+                //
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("patrimonio", patrimonio);
+                bundle.putString("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
+                bundle.putString("setor", patrimonio.getSetor().getBloco() + " - " + patrimonio.getSetor().getSala());
+                bundle.putString("objeto", patrimonio.getObjeto().getTipo() + " - " + patrimonio.getObjeto().getMarca() + " " + patrimonio.getObjeto().getModelo());
+
+                Fragment fragment = new EditPatrimonioFragment();
+                fragment.setArguments(bundle);
+
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, fragment).commit();
+                MainActivity.frag = fragment;
+
+
+
+                ///
+                /*
                 Intent intent = new Intent(getActivity(), EditPatrimonioActivity.class);
                 intent.putExtra("patrimonio", patrimonio);
                 intent.putExtra("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
                 intent.putExtra("setor", patrimonio.getSetor().getBloco() + " - " + patrimonio.getSetor().getSala());
                 intent.putExtra("objeto", patrimonio.getObjeto().getTipo() + " - " + patrimonio.getObjeto().getMarca() + " " + patrimonio.getObjeto().getModelo());
-                startActivity(intent);
+                startActivity(intent); */
             }
 
             @Override

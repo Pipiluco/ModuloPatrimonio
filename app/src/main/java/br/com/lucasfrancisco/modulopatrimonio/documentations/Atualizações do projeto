@@ -12,6 +12,7 @@ Feito
     05-05-2019 Correção de bugs na adição de imagens no Firebase
     06-05-2019 Implementado a adição de usuário na edição de patrimônio
     06-05-2019 Implementado horário de criação e edição de patrimônio
+    08-05-2019 Implementado Fragment para edição de Endereço e Patrimônio
 
 
 
@@ -22,6 +23,7 @@ Fazer
     Implementar notificação para salvar e atualizar patrimônio
     Implementar nível de parmissão para usuários
     Implementar fragment de opções para cada tipo de conteudo novo
+    Corrigir os métodos atualizar
 
 
 
