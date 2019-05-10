@@ -1,7 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,8 +23,9 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoObjetoActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.ObjetoAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoObjetoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Objeto;
@@ -130,8 +130,9 @@ public class ObjetoFragment extends Fragment {
         fabNovo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), NovoObjetoActivity.class);
-                startActivity(intent);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new NovoObjetoFragment()).commit();
+                MainActivity.fragment = new NovoObjetoFragment();
             }
         });
     }

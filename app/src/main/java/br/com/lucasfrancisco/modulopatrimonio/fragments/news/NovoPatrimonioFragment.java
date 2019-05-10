@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoSetorActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.ImagemAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
@@ -73,7 +74,7 @@ public class NovoPatrimonioFragment extends Fragment {
     private EditText edtPlaqueta;
     private ImageButton imbScanner;
     private RecyclerView rcyImagens;
-    private FloatingActionButton fabNovaFoto, fabGaleria;
+    private FloatingActionButton fabNovaFoto, fabGaleria, fabNovoSetor;
     private ProgressDialog progressDialog;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -111,6 +112,7 @@ public class NovoPatrimonioFragment extends Fragment {
         rcyImagens = (RecyclerView) view.findViewById(R.id.rcyImagens);
         fabNovaFoto = (FloatingActionButton) view.findViewById(R.id.fabNovaFoto);
         fabGaleria = (FloatingActionButton) view.findViewById(R.id.fabGaleria);
+        fabNovoSetor = (FloatingActionButton) view.findViewById(R.id.fabNovoSetor);
 
         progressDialog = new ProgressDialog(getActivity());
         imagens = new ArrayList<>();
@@ -129,6 +131,7 @@ public class NovoPatrimonioFragment extends Fragment {
         getSpinnerObjetos();
         getFabNovaFoto();
         getFabGaleria();
+        getFabNovoSetor();
         getItemTouch();
         getClickRecyclerView();
         getImbScanner();
@@ -456,6 +459,15 @@ public class NovoPatrimonioFragment extends Fragment {
         });
     }
 
+    public void getFabNovoSetor() {
+        fabNovoSetor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), NovoSetorActivity.class));
+            }
+        });
+    }
+
     public void getImbScanner() {
         imbScanner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -562,9 +574,7 @@ public class NovoPatrimonioFragment extends Fragment {
         }
     }
 
-
     public String setFragment() {
         return "NovoPatrimonioFragment";
     }
-
 }

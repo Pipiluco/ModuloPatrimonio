@@ -41,6 +41,7 @@ import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragme
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovaEmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoEnderecoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoObjetoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
@@ -191,6 +192,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (fragment instanceof NovaEmpresaFragment) {
             NovaEmpresaFragment novaEmpresaFragment = (NovaEmpresaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             novaEmpresaFragment.setMenuItem(opcao);
+        } else if (fragment instanceof NovoObjetoFragment) {
+            NovoObjetoFragment novoObjetoFragment = (NovoObjetoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            novoObjetoFragment.setMenuItem(opcao);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }

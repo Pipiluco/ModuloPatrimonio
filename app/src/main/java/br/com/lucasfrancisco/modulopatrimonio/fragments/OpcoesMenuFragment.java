@@ -68,6 +68,9 @@ public class OpcoesMenuFragment extends Fragment {
             case "NovaEmpresaFragment":
                 super.onPrepareOptionsMenu(menusNew.menuPrepareOptionsEmpresa(menu));
                 break;
+            case "NovoObjetoFragment":
+                super.onPrepareOptionsMenu(menusNew.menuPrepareOptionsObjeto(menu));
+                break;
         }
     }
 
@@ -93,6 +96,9 @@ public class OpcoesMenuFragment extends Fragment {
                 break;
             case "NovaEmpresaFragment":
                 menusNew.menuSelectedOptionsEmpresa(communicateOpcoesMenuFragment, item);
+                break;
+            case "NovoObjetoFragment":
+                menusNew.menuSelectedOptionsObjeto(communicateOpcoesMenuFragment, item);
                 break;
         }
         return false;

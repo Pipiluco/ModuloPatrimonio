@@ -38,6 +38,7 @@
                 android:prompt="@string/escolha_objeto"
                 android:spinnerMode="dialog" />
 
+
             <EditText
                 android:id="@+id/edtPlaqueta"
                 android:layout_width="match_parent"
@@ -93,6 +94,14 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_photo"
             app:fab_label="@string/camera"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovoSetor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery_01"
+            app:fab_label="@string/setor"
             app:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 </RelativeLayout>
