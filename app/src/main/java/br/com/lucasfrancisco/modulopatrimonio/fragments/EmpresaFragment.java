@@ -28,8 +28,10 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovaEmpresaActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EmpresaAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovaEmpresaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 
@@ -130,8 +132,9 @@ public class EmpresaFragment extends Fragment {
         fabNova.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), NovaEmpresaActivity.class);
-                startActivity(intent);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new NovaEmpresaFragment()).commit();
+                MainActivity.fragment = new NovaEmpresaFragment();
             }
         });
     }

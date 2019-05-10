@@ -49,7 +49,10 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EditImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.models.Empresa;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
@@ -216,6 +219,7 @@ public class EditPatrimonioFragment extends Fragment {
                                 collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
                                 patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
                                 collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                                voltaFragments();
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -229,6 +233,7 @@ public class EditPatrimonioFragment extends Fragment {
                         collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
                         patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
                         collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+                        voltaFragments();
                     }
                 }
             }
@@ -236,6 +241,7 @@ public class EditPatrimonioFragment extends Fragment {
             collectionReference.document(empresaVelha).collection("Patrimonios").document(plaqueta).delete(); // Primeiro deleta para depois salvar. Isto evita ter dois patriônios iguais em mais de uma empresa
             patrimonio = new Patrimonio(criador, editor, dataCriacao, dataEdicao, plaqueta, isAtivo, setor, objeto, imagens);
             collectionReference.document(empresa).collection("Patrimonios").document(plaqueta).set(patrimonio);
+            voltaFragments();
         }
     }
 
@@ -261,7 +267,7 @@ public class EditPatrimonioFragment extends Fragment {
                         isPatrimonio = true;
                         documentReference.delete();
                         Toast.makeText(getActivity(), getString(R.string.patrimonio_excluido), Toast.LENGTH_SHORT).show();
-                        getActivity().finish();
+                        voltaFragments();
                     }
                 }
                 if (!isPatrimonio) {
@@ -531,11 +537,15 @@ public class EditPatrimonioFragment extends Fragment {
             case "Excluir":
                 excluir();
                 break;
-            case "Câmera":
-
-                break;
         }
     }
+
+    public void voltaFragments() {
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
+        MainActivity.fragment = new PatrimonioFragment();
+    }
+
 
     public String setFragment() {
         return "EditPatrimonioFragment";

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.news.NovoPatrimonioFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_linear_layout">
+
+            <Spinner
+                android:id="@+id/spnEmpresa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/escolha_empresa"
+                android:spinnerMode="dialog" />
+
+            <Spinner
+                android:id="@+id/spnSetor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spnEmpresa"
+                android:prompt="@string/escolha_setor"
+                android:spinnerMode="dialog" />
+
+            <Spinner
+                android:id="@+id/spnObjeto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spnSetor"
+                android:prompt="@string/escolha_objeto"
+                android:spinnerMode="dialog" />
+
+            <EditText
+                android:id="@+id/edtPlaqueta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spnObjeto"
+                android:layout_toStartOf="@+id/imbScanner"
+                android:ems="10"
+                android:hint="@string/plaqueta"
+                android:inputType="number"
+                android:text="" />
+
+            <ImageButton
+                android:id="@+id/imbScanner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/rcyImagens"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_barcode_01" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcyImagens"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/edtPlaqueta"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/famNovaImagem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_colorPressed="@color/colorAccent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabGaleria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gallery_01"
+            app:fab_label="@string/galeria"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovaFoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_photo"
+            app:fab_label="@string/camera"
+            app:fab_size="mini" />
+    </com.github.clans.fab.FloatingActionMenu>
+</RelativeLayout>

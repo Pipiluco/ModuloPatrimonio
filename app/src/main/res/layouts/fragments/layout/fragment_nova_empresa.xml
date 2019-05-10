@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding_linear_layout"
+    tools:context=".fragments.news.NovaEmpresaFragment">
+
+    <EditText
+        android:id="@+id/edtNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/nome"
+        android:inputType="textMultiLine" />
+
+    <EditText
+        android:id="@+id/edtFantasia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtNome"
+        android:ems="10"
+        android:hint="@string/fantasia"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/edtCodigo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtFantasia"
+        android:ems="10"
+        android:hint="@string/codigo"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/edtCNPJ"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtCodigo"
+        android:ems="10"
+        android:hint="@string/cnpj"
+        android:inputType="number" />
+
+    <Spinner
+        android:id="@+id/spnEndereco"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtCNPJ"
+        android:prompt="@string/escolha_endereco"
+        android:spinnerMode="dialog" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/famNovaEmpresa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_colorPressed="@color/colorAccent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovoEndereco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_address_01"
+            app:fab_label="@string/endereco"
+            app:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+</RelativeLayout>

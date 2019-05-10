@@ -1,4 +1,4 @@
-package br.com.lucasfrancisco.modulopatrimonio.fragments.edits;
+package br.com.lucasfrancisco.modulopatrimonio.fragments.news;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -31,7 +31,9 @@ import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFr
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 import br.com.lucasfrancisco.modulopatrimonio.models.Usuario;
 
-public class EditEnderecoFragment extends Fragment {
+public class NovoEnderecoFragment extends Fragment {
+    private CommunicateOpcoesMenuFragment communicateOpcoesMenuFragment;
+
     private EditText edtRua, edtNumero, edtCEP, edtBairro, edtCidade, edtEstado, edtPais;
 
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -39,20 +41,14 @@ public class EditEnderecoFragment extends Fragment {
     private FirebaseUser firebaseUser;
 
     private ArrayList<String> listEnderecos;
-    private Endereco endereco;
-
-    private CommunicateOpcoesMenuFragment communicateOpcoesMenuFragment;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_endereco, container, false);
+        View view = inflater.inflate(R.layout.fragment_novo_endereco, container, false);
         communicateOpcoesMenuFragment.onSetFragment(setFragment());
 
         getListEnderecos();
-
-        Bundle bundle = getArguments();
-        endereco = (Endereco) bundle.getSerializable("endereco");
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -65,16 +61,6 @@ public class EditEnderecoFragment extends Fragment {
         edtEstado = (EditText) view.findViewById(R.id.edtEstado);
         edtPais = (EditText) view.findViewById(R.id.edtPais);
 
-        edtRua.setText(endereco.getRua());
-        edtNumero.setText(String.valueOf(endereco.getNumero()));
-        edtCEP.setText(endereco.getCEP());
-        edtBairro.setText(endereco.getBairro());
-        edtCidade.setText(endereco.getCidade());
-        edtEstado.setText(endereco.getEstado());
-        edtPais.setText(endereco.getPais());
-
-        desativaEdicao();
-
         return view;
     }
 
@@ -85,48 +71,13 @@ public class EditEnderecoFragment extends Fragment {
         try {
             communicateOpcoesMenuFragment = (CommunicateOpcoesMenuFragment) context;
         } catch (Exception e) {
-            Log.w("EditEnderecoFragment", e.toString());
+            Log.w("NovoEnderecoFragment", e.toString());
             Toast.makeText(getActivity(), "Erro: " + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
-    public void setMenuItem(String opcao) {
-        Toast.makeText(getActivity(), opcao, Toast.LENGTH_LONG).show();
 
-        switch (opcao) {
-            case "Editar":
-                ativaEdicao();
-                break;
-            case "Salvar":
-                atualizar();
-                break;
-            case "Excluir":
-                excluir();
-                break;
-        }
-    }
-
-    public void ativaEdicao() {
-        // edtRua.setEnabled(true);
-        // edtNumero.setEnabled(true);
-        // edtCEP.setEnabled(true);
-        edtBairro.setEnabled(true);
-        edtCidade.setEnabled(true);
-        edtEstado.setEnabled(true);
-        edtPais.setEnabled(true);
-    }
-
-    public void desativaEdicao() {
-        edtRua.setEnabled(false);
-        edtNumero.setEnabled(false);
-        edtCEP.setEnabled(false);
-        edtBairro.setEnabled(false);
-        edtCidade.setEnabled(false);
-        edtEstado.setEnabled(false);
-        edtPais.setEnabled(false);
-    }
-
-    public void atualizar() {
+    public void salvar() {
         String rua = edtRua.getText().toString();
         String numero = edtNumero.getText().toString();
         String cep = edtCEP.getText().toString();
@@ -135,44 +86,44 @@ public class EditEnderecoFragment extends Fragment {
         String estado = edtEstado.getText().toString();
         String pais = edtPais.getText().toString();
         String documento = cep + " - " + rua + " - " + numero;
-        Usuario criador = endereco.getCriador();
-        Usuario editor = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
-        Date dataCriacao = endereco.getDataCriacao();
-        Date dataEdicao = Timestamp.now().toDate();
-        CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
-
-        Log.d("Endereços", "" + listEnderecos.size());
-
-        if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
-            Toast.makeText(getActivity(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
-        } else {
-            endereco = new Endereco(criador, editor, dataCriacao, dataEdicao, rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
-            collectionReference.document(documento).set(endereco);
-            Toast.makeText(getActivity(), getString(R.string.endereco_atualizado), Toast.LENGTH_SHORT).show();
-            voltaFragments();
-        }
-    }
-
-    public void excluir() {
-        String rua = edtRua.getText().toString();
-        String numero = edtNumero.getText().toString();
-        String cep = edtCEP.getText().toString();
-        String documento = cep + " - " + rua + " - " + numero;
+        Usuario criador = new Usuario(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), null, null);
+        Date dataCriacao = Timestamp.now().toDate();
         Boolean isEndereco = false;
         CollectionReference collectionReference = firebaseFirestore.collection("Enderecos");
+        Endereco endereco;
+
+        Log.d("Endereços", "" + listEnderecos.size());
 
         if (listEnderecos != null) {
             for (int i = 0; i < listEnderecos.size(); i++) {
                 if (documento.equals(listEnderecos.get(i))) {
                     isEndereco = true;
-                    collectionReference.document(documento).delete();
-                    Toast.makeText(getActivity(), getString(R.string.endereco_excluido), Toast.LENGTH_SHORT).show();
-                    voltaFragments();
+                    Toast.makeText(getActivity(), getString(R.string.endereco_ja_existe) + " (" + documento + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             if (!isEndereco) {
-                Toast.makeText(getActivity(), getString(R.string.endereco_nao_encontrado), Toast.LENGTH_SHORT).show();
+                if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
+                    Toast.makeText(getActivity(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+                } else {
+                    endereco = new Endereco(criador, null, dataCriacao, null, rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                    collectionReference.document(documento).set(endereco);
+                    Toast.makeText(getActivity(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
+                    getListEnderecos();
+                    isEndereco = true;
+                    voltaFragments();
+                }
+            }
+        } else {
+            if (rua.trim().isEmpty() || numero.trim().isEmpty() || cep.trim().isEmpty() || bairro.trim().isEmpty() || cidade.trim().isEmpty() || estado.trim().isEmpty() || pais.trim().isEmpty()) {
+                Toast.makeText(getActivity(), getString(R.string.dados_incompletos), Toast.LENGTH_SHORT).show();
+            } else {
+                endereco = new Endereco(criador, null, dataCriacao, null, rua, Integer.parseInt(numero), cep, bairro, cidade, estado, pais);
+                collectionReference.document(documento).set(endereco);
+                Toast.makeText(getActivity(), getString(R.string.endereco_salvo), Toast.LENGTH_SHORT).show();
+                getListEnderecos();
+                isEndereco = true;
+                voltaFragments();
             }
         }
     }
@@ -198,7 +149,17 @@ public class EditEnderecoFragment extends Fragment {
         MainActivity.fragment = new EnderecoFragment();
     }
 
+    public void setMenuItem(String opcao) {
+        Toast.makeText(getActivity(), opcao, Toast.LENGTH_LONG).show();
+
+        switch (opcao) {
+            case "Salvar":
+                salvar();
+                break;
+        }
+    }
+
     public String setFragment() {
-        return "EditEnderecoFragment";
+        return "NovoEnderecoFragment";
     }
 }

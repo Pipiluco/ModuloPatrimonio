@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,11 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.util.Objects;
-
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.menus.MenusEdit;
+import br.com.lucasfrancisco.modulopatrimonio.menus.MenusNew;
 
 public class OpcoesMenuFragment extends Fragment {
     private CommunicateOpcoesMenuFragment communicateOpcoesMenuFragment;
@@ -34,7 +32,6 @@ public class OpcoesMenuFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setSubtitle("Teste");
         return inflater.inflate(R.layout.fragment_opcoes_menu, container, false);
     }
 
@@ -52,6 +49,7 @@ public class OpcoesMenuFragment extends Fragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        MenusNew menusNew = new MenusNew(getActivity());
         MenusEdit menusEdit = new MenusEdit(getActivity());
 
         switch (fragment) {
@@ -61,6 +59,15 @@ public class OpcoesMenuFragment extends Fragment {
             case "EditEnderecoFragment":
                 super.onPrepareOptionsMenu(menusEdit.menuPrepareOptionsEndereco(menu));
                 break;
+            case "NovoPatrimonioFragment":
+                super.onPrepareOptionsMenu(menusNew.menuPrepareOptionsPatrimonio(menu));
+                break;
+            case "NovoEnderecoFragment":
+                super.onPrepareOptionsMenu(menusNew.menuPrepareOptionsEndereco(menu));
+                break;
+            case "NovaEmpresaFragment":
+                super.onPrepareOptionsMenu(menusNew.menuPrepareOptionsEmpresa(menu));
+                break;
         }
     }
 
@@ -68,6 +75,7 @@ public class OpcoesMenuFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
 
+        MenusNew menusNew = new MenusNew(getActivity());
         MenusEdit menusEdit = new MenusEdit(getActivity());
 
         switch (fragment) {
@@ -76,6 +84,15 @@ public class OpcoesMenuFragment extends Fragment {
                 break;
             case "EditEnderecoFragment":
                 menusEdit.menuSelectedOptionsEndereco(communicateOpcoesMenuFragment, item);
+                break;
+            case "NovoPatrimonioFragment":
+                menusNew.menuSelectedOptionsPatrimonio(communicateOpcoesMenuFragment, item);
+                break;
+            case "NovoEnderecoFragment":
+                menusNew.menuSelectedOptionsEndereco(communicateOpcoesMenuFragment, item);
+                break;
+            case "NovaEmpresaFragment":
+                menusNew.menuSelectedOptionsEmpresa(communicateOpcoesMenuFragment, item);
                 break;
         }
         return false;

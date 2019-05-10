@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding_linear_layout"
+    tools:context=".fragments.news.NovoEnderecoFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/edtRua"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/rua"
+                android:inputType="textMultiLine" />
+
+            <EditText
+                android:id="@+id/edtNumero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtRua"
+                android:ems="10"
+                android:hint="@string/numero"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/edtCEP"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtNumero"
+                android:ems="10"
+                android:hint="@string/cep"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/edtBairro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtCEP"
+                android:ems="10"
+                android:hint="@string/bairro"
+                android:inputType="textMultiLine" />
+
+            <EditText
+                android:id="@+id/edtCidade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtBairro"
+                android:ems="10"
+                android:hint="@string/cidade"
+                android:inputType="textMultiLine" />
+
+            <EditText
+                android:id="@+id/edtEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtCidade"
+                android:ems="10"
+                android:hint="@string/estado"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/edtPais"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtEstado"
+                android:ems="10"
+                android:hint="@string/pais"
+                android:inputType="text" />
+
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

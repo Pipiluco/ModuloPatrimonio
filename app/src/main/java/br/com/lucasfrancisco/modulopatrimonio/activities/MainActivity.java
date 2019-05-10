@@ -39,11 +39,15 @@ import br.com.lucasfrancisco.modulopatrimonio.fragments.PatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.PesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovaEmpresaFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoEnderecoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, CommunicatePesquisaFragment, CommunicateOpcoesMenuFragment {
-    public static Fragment frag = null;
+    // Fragment
+    public static Fragment fragment = null;
 
     private long backPressedTime;
     private Toast backToast;
@@ -56,9 +60,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // header_usuario
     private ImageView imvPerfil;
     private TextView tvNome, tvEmail;
-
-    // Fragment
-    private Fragment fragment = null;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Fragments iniciais
         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
-        setFragment(new PatrimonioFragment());
+        fragment = new PatrimonioFragment();
 
         // header_usuario
         View headerUsuario = ngvMain.getHeaderView(0);
@@ -144,20 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    // Dados entre Fragments
-    public Fragment getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(Fragment fragment) {
-        this.fragment = fragment;
-    }
 
     // Utilizado para pesquisas
     @Override
     public void onSetText(String texto, String filtro, long limite) {
-        Fragment fragment = getFragment();
-
         if (fragment instanceof PatrimonioFragment) {
             PatrimonioFragment patrimonioFragment = (PatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             patrimonioFragment.pesquisar(texto, filtro, limite);
@@ -185,12 +176,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Utilizado para escolher o menu adequado para cada tipo de fragment fmlConteudo
     @Override
     public void onSetMenuItem(String opcao) {
-        if (frag instanceof EditEnderecoFragment) {
+        if (fragment instanceof EditEnderecoFragment) {
             EditEnderecoFragment editEnderecoFragment = (EditEnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             editEnderecoFragment.setMenuItem(opcao);
-        } else if (frag instanceof EditPatrimonioFragment) {
+        } else if (fragment instanceof EditPatrimonioFragment) {
             EditPatrimonioFragment editPatrimonioFragment = (EditPatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
             editPatrimonioFragment.setMenuItem(opcao);
+        } else if (fragment instanceof NovoPatrimonioFragment) {
+            NovoPatrimonioFragment novoPatrimonioFragment = (NovoPatrimonioFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            novoPatrimonioFragment.setMenuItem(opcao);
+        } else if (fragment instanceof NovoEnderecoFragment) {
+            NovoEnderecoFragment novoEnderecoFragment = (NovoEnderecoFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            novoEnderecoFragment.setMenuItem(opcao);
+        } else if (fragment instanceof NovaEmpresaFragment) {
+            NovaEmpresaFragment novaEmpresaFragment = (NovaEmpresaFragment) getSupportFragmentManager().findFragmentById(R.id.fmlConteudo);
+            novaEmpresaFragment.setMenuItem(opcao);
         } else {
             Log.d("FRAGMENT", "Sem opção");
         }
@@ -212,22 +212,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.itPatrimonio:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new PatrimonioFragment()).commit();
-                        setFragment(new PatrimonioFragment());
+                        fragment = new PatrimonioFragment();
                         break;
                     case R.id.itEmpresa:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EmpresaFragment()).commit();
-                        setFragment(new EmpresaFragment());
+                        fragment = new EmpresaFragment();
                         break;
                     case R.id.itEndereco:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new EnderecoFragment()).commit();
-                        setFragment(new EnderecoFragment());
+                        fragment = new EnderecoFragment();
                         break;
                     case R.id.itObjeto:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new PesquisaFragment()).commit();
                         getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new ObjetoFragment()).commit();
-                        setFragment(new ObjetoFragment());
+                        fragment = new ObjetoFragment();
                         break;
                 }
                 return true;

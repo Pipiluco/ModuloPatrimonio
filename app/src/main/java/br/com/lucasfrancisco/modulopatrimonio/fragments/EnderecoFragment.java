@@ -29,6 +29,7 @@ import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoEnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
@@ -151,7 +152,7 @@ public class EnderecoFragment extends Fragment {
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, fragment).commit();
-                MainActivity.frag = fragment;
+                MainActivity.fragment = fragment;
 
                 closeFloatingActionMenu();
             }
@@ -180,8 +181,9 @@ public class EnderecoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 closeFloatingActionMenu();
-                Intent intent = new Intent(getActivity(), NovoEnderecoActivity.class);
-                startActivity(intent);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new NovoEnderecoFragment()).commit();
+                MainActivity.fragment = new NovoEnderecoFragment();
             }
         });
     }

@@ -1,7 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -33,11 +32,10 @@ import java.util.ArrayList;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.edits.EditPatrimonioActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoPatrimonioActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.PatrimonioAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.dao.preferences.SharedPreferencesEmpresa;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFragment;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
@@ -99,8 +97,9 @@ public class PatrimonioFragment extends Fragment {
         fabNovo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), NovoPatrimonioActivity.class);
-                startActivity(intent);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new NovoPatrimonioFragment()).commit();
+                MainActivity.fragment = new NovoPatrimonioFragment();
             }
         });
     }
@@ -247,7 +246,7 @@ public class PatrimonioFragment extends Fragment {
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, fragment).commit();
-                MainActivity.frag = fragment;
+                MainActivity.fragment = fragment;
 
 
 
