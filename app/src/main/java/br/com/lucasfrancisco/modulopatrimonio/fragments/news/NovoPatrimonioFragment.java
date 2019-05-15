@@ -1,7 +1,6 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments.news;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -51,8 +50,9 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoSetorActivity;
+import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.ImagemAdapter;
+import br.com.lucasfrancisco.modulopatrimonio.fragments.OpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicateOpcoesMenuFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYViewClickListener;
 import br.com.lucasfrancisco.modulopatrimonio.models.Imagem;
@@ -88,7 +88,6 @@ public class NovoPatrimonioFragment extends Fragment {
     private List<Imagem> imagens;
     private int contador = 0;
 
-    private Activity activity = getActivity();
     private Uri uriImagemCamera;
 
     private NotificationManagerCompat notificationManagerCompat;
@@ -463,7 +462,9 @@ public class NovoPatrimonioFragment extends Fragment {
         fabNovoSetor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), NovoSetorActivity.class));
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, new NovoSetorFragment()).commit();
+                MainActivity.fragment = new NovoSetorFragment();
             }
         });
     }
@@ -472,7 +473,7 @@ public class NovoPatrimonioFragment extends Fragment {
         imbScanner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
+                IntentIntegrator integrator = new IntentIntegrator(getActivity());
                 integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                 integrator.setPrompt(getString(R.string.aponte_a_camera_para_codigo));
                 integrator.setCameraId(0);

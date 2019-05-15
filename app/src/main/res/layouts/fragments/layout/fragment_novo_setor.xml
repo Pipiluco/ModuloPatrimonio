@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding_linear_layout"
+    tools:context=".fragments.news.NovoSetorFragment">
+
+    <Spinner
+        android:id="@+id/spnEmpresa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/escolha_empresa"
+        android:spinnerMode="dialog" />
+
+    <EditText
+        android:id="@+id/edtTipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spnEmpresa"
+        android:ems="10"
+        android:hint="@string/tipo"
+        android:inputType="textMultiLine" />
+
+    <EditText
+        android:id="@+id/edtBloco"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtTipo"
+        android:ems="10"
+        android:hint="@string/bloco"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/edtSala"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtBloco"
+        android:ems="10"
+        android:hint="@string/sala"
+        android:inputType="text" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/famNovoSetor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_colorPressed="@color/colorAccent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabNovaEmpresa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_empresa_01"
+            app:fab_label="@string/empresa"
+            app:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+</RelativeLayout>
