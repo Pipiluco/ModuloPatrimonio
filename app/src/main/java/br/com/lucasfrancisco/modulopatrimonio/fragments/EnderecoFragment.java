@@ -1,6 +1,5 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -39,11 +37,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
-import br.com.lucasfrancisco.modulopatrimonio.activities.news.NovoEnderecoActivity;
 import br.com.lucasfrancisco.modulopatrimonio.adapters.EnderecoAdapter;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditEnderecoFragment;
 import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoEnderecoFragment;
@@ -137,6 +133,7 @@ public class EnderecoFragment extends Fragment {
     }
 
 
+    // Cria planilha
     private void requestCreateXLSX(final Intent intent) {
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -151,7 +148,6 @@ public class EnderecoFragment extends Fragment {
                 List<Endereco> enderecos = new ArrayList<>();
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
                 XSSFSheet xssfSheet = xssfWorkbook.createSheet("Endereços");
-                //  Map<String, CellStyle> styles = StylesXLSX.createStyles(xssfWorkbook, xssfSheet);
                 String titulo = "Endereços SENAI";
                 String[] subtitulos = {"Rua", "Número", "CEP", "Bairro", "Cidade", "Estado", "Pais"};
 
@@ -231,7 +227,6 @@ public class EnderecoFragment extends Fragment {
                     xssfWorkbook.write(outputStream);
                     outputStream.close();
                     Log.d("EnderecoFragment", "Arquivo Excel criado com sucesso!");
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     Log.d("EnderecoFragment", "Arquivo não encontrado!");

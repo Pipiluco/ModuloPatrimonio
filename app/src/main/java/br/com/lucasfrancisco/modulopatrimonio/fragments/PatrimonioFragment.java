@@ -1,6 +1,7 @@
 package br.com.lucasfrancisco.modulopatrimonio.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -28,7 +29,19 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.PrintSetup;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import br.com.lucasfrancisco.modulopatrimonio.R;
 import br.com.lucasfrancisco.modulopatrimonio.activities.MainActivity;
@@ -38,11 +51,18 @@ import br.com.lucasfrancisco.modulopatrimonio.fragments.edits.EditPatrimonioFrag
 import br.com.lucasfrancisco.modulopatrimonio.fragments.news.NovoPatrimonioFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.CommunicatePesquisaFragment;
 import br.com.lucasfrancisco.modulopatrimonio.interfaces.RCYDocumentSnapshotClickListener;
+import br.com.lucasfrancisco.modulopatrimonio.models.Endereco;
 import br.com.lucasfrancisco.modulopatrimonio.models.Patrimonio;
+import br.com.lucasfrancisco.modulopatrimonio.styles.StylesXLSX;
+
+import static android.app.Activity.RESULT_OK;
 
 public class PatrimonioFragment extends Fragment {
+    private static final int REQUEST_CREATE_XLSX = 10;
+
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = firebaseFirestore.collection("Empresas");
+    private Query query;
 
     private CommunicatePesquisaFragment communicatePesquisaFragment;
 
@@ -54,7 +74,6 @@ public class PatrimonioFragment extends Fragment {
 
     private ArrayAdapter adapter;
     private String empresaEscolhida = "";
-    private String setorEscolhido = "";
 
 
     @Override
@@ -62,7 +81,7 @@ public class PatrimonioFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_patrimonio, container, false);
         communicatePesquisaFragment.onSetFilter(setListFiltros());
 
-        Query query = collectionReference.document("4081 - SENAI Indaial").collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
+        query = collectionReference.document("4081 - SENAI Indaial").collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
         firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
         patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
 
@@ -77,6 +96,7 @@ public class PatrimonioFragment extends Fragment {
 
         // Métodos de eventos
         getFabFiltro();
+        getFabXls();
         getFabNovo();
         getAdapterItemTouch();
         getRecyclerViewClickListener();
@@ -84,11 +104,28 @@ public class PatrimonioFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CREATE_XLSX: // Abre a galeria
+                    requestCreateXLSX(data);
+                    break;
+            }
+        }
+    }
+
     public void getFabXls() {
         fabXls.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Exportar para XLS", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_TITLE, "Patrimônios.xlsx");
+                intent.setType("*/*");
+                startActivityForResult(intent, REQUEST_CREATE_XLSX);
             }
         });
     }
@@ -172,7 +209,7 @@ public class PatrimonioFragment extends Fragment {
                 spnSetor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        setorEscolhido = spnSetor.getSelectedItem().toString();
+
                     }
 
                     @Override
@@ -188,7 +225,7 @@ public class PatrimonioFragment extends Fragment {
         btnFiltrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Query query = collectionReference.document(empresaEscolhida).collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
+                query = collectionReference.document(empresaEscolhida).collection("Patrimonios").orderBy("plaqueta", Query.Direction.ASCENDING);
                 firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
                 patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
 
@@ -234,7 +271,6 @@ public class PatrimonioFragment extends Fragment {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int posicao) {
                 Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
-                //
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("patrimonio", patrimonio);
                 bundle.putString("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
@@ -247,17 +283,6 @@ public class PatrimonioFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlPesquisa, new OpcoesMenuFragment()).commit();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fmlConteudo, fragment).commit();
                 MainActivity.fragment = fragment;
-
-
-
-                ///
-                /*
-                Intent intent = new Intent(getActivity(), EditPatrimonioActivity.class);
-                intent.putExtra("patrimonio", patrimonio);
-                intent.putExtra("empresa", patrimonio.getSetor().getEmpresa().getCodigo() + " - " + patrimonio.getSetor().getEmpresa().getFantasia() + " " + patrimonio.getSetor().getEmpresa().getEndereco().getCidade());
-                intent.putExtra("setor", patrimonio.getSetor().getBloco() + " - " + patrimonio.getSetor().getSala());
-                intent.putExtra("objeto", patrimonio.getObjeto().getTipo() + " - " + patrimonio.getObjeto().getMarca() + " " + patrimonio.getObjeto().getModelo());
-                startActivity(intent); */
             }
 
             @Override
@@ -298,8 +323,8 @@ public class PatrimonioFragment extends Fragment {
             pesquisa = pesquisa.substring(0, 1).toUpperCase().concat(pesquisa.substring(1));
         }
 
-        Query queryLocal = collectionReference.document(empresa).collection("Patrimonios").orderBy("plaqueta").startAt(pesquisa).endAt(pesquisa + "\uf8ff").limit(limite);
-        FirestoreRecyclerOptions<Patrimonio> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(queryLocal, Patrimonio.class).build();
+        query = collectionReference.document(empresa).collection("Patrimonios").orderBy("plaqueta").startAt(pesquisa).endAt(pesquisa + "\uf8ff").limit(limite);
+        FirestoreRecyclerOptions<Patrimonio> firestoreRecyclerOptions = new FirestoreRecyclerOptions.Builder<Patrimonio>().setQuery(query, Patrimonio.class).build();
         patrimonioAdapter = new PatrimonioAdapter(firestoreRecyclerOptions);
 
         rcyPatrimonios.setHasFixedSize(true);
@@ -330,6 +355,111 @@ public class PatrimonioFragment extends Fragment {
             listFiltros.add(codigo);
         }
         return listFiltros;
+    }
+
+    // Cria planilha
+    private void requestCreateXLSX(final Intent intent) {
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                OutputStream outputStream = null;
+                try {
+                    outputStream = getActivity().getContentResolver().openOutputStream(intent.getData());
+                } catch (FileNotFoundException e) {
+                    Log.d("PatrimonioFragment", e.getMessage());
+                }
+
+                List<Patrimonio> patrimonios = new ArrayList<>();
+                XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
+                XSSFSheet xssfSheet = xssfWorkbook.createSheet("Patrimônios");
+                String titulo = "Patrimônios " + empresaEscolhida;
+                String[] subtitulos = {"Plaqueta", "Tipo", "Marca", "Modelo", "Empresa", "Bloco", "Sala"};
+
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Patrimonio patrimonio = documentSnapshot.toObject(Patrimonio.class);
+                    patrimonios.add(patrimonio);
+                }
+
+                //desliga e liga linhas de grade
+                xssfSheet.setDisplayGridlines(false); // Grades
+                xssfSheet.setPrintGridlines(false);
+                xssfSheet.setFitToPage(true);
+                xssfSheet.setHorizontallyCenter(true);
+                PrintSetup printSetup = xssfSheet.getPrintSetup();
+                printSetup.setLandscape(true);
+
+                // Cria título
+                Row rowTitulo = xssfSheet.createRow(0);
+                for (int i = 1; i < subtitulos.length; i++) {
+                    rowTitulo.createCell(i).setCellStyle(StylesXLSX.createStylesTitle(xssfWorkbook));
+                }
+                Cell cellTitulo = rowTitulo.createCell(0);
+                cellTitulo.setCellValue(titulo);
+                cellTitulo.setCellStyle(StylesXLSX.createStylesTitle(xssfWorkbook));
+                xssfSheet.addMergedRegion(CellRangeAddress.valueOf("$A$1:$G$1"));
+
+                // Cria subtítulo
+                Row rowSubtitulo = xssfSheet.createRow(1);
+                for (int i = 0; i < subtitulos.length; i++) {
+                    xssfSheet.setColumnWidth(i, 15 * 256); // setColumnWidth(indice, largura)
+                    Cell cell = rowSubtitulo.createCell(i);
+                    cell.setCellValue(subtitulos[i]);
+                    cell.setCellStyle(StylesXLSX.createStylesSubtitle(xssfWorkbook));
+                }
+
+                int rownum = 2;
+                for (Patrimonio patrimonio : patrimonios) {
+                    CellStyle styleCorpo;
+                    if (rownum % 2 == 0) {
+                        styleCorpo = StylesXLSX.createStylesBody1(xssfWorkbook);
+                    } else {
+                        styleCorpo = StylesXLSX.createStylesBody2(xssfWorkbook);
+                    }
+
+                    Row row = xssfSheet.createRow(rownum++);
+                    int cellnum = 0;
+                    Cell cellPalqueta = row.createCell(cellnum++);
+                    cellPalqueta.setCellValue(patrimonio.getPlaqueta());
+                    cellPalqueta.setCellStyle(styleCorpo);
+
+                    Cell cellTipo = row.createCell(cellnum++);
+                    cellTipo.setCellValue(patrimonio.getObjeto().getTipo());
+                    cellTipo.setCellStyle(styleCorpo);
+
+                    Cell cellMarca = row.createCell(cellnum++);
+                    cellMarca.setCellValue(patrimonio.getObjeto().getMarca());
+                    cellMarca.setCellStyle(styleCorpo);
+
+                    Cell cellModelo = row.createCell(cellnum++);
+                    cellModelo.setCellValue(patrimonio.getObjeto().getModelo());
+                    cellModelo.setCellStyle(styleCorpo);
+
+                    Cell cellEmpresa = row.createCell(cellnum++);
+                    cellEmpresa.setCellValue(patrimonio.getSetor().getEmpresa().getFantasia());
+                    cellEmpresa.setCellStyle(styleCorpo);
+
+                    Cell cellBloco = row.createCell(cellnum++);
+                    cellBloco.setCellValue(patrimonio.getSetor().getBloco());
+                    cellBloco.setCellStyle(styleCorpo);
+
+                    Cell cellSala = row.createCell(cellnum++);
+                    cellSala.setCellValue(patrimonio.getSetor().getSala());
+                    cellSala.setCellStyle(styleCorpo);
+                }
+
+                try {
+                    xssfWorkbook.write(outputStream);
+                    outputStream.close();
+                    Log.d("PatrimonioFragment", "Arquivo Excel criado com sucesso!");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Log.d("PatrimonioFragment", "Arquivo não encontrado!");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("PatrimonioFragment", "Erro na edição do arquivo!");
+                }
+            }
+        });
     }
 }
 
